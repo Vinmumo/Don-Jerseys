@@ -3,23 +3,36 @@ import { Link } from "react-router-dom";
 
 
 const jerseys = [
-  { id: 1, name: "Manchester City Home Jersey", team: "Manchester City", price: 12000, image: "https://havencraft.co.ke/wp-content/uploads/2024/08/MCFC-24-25-Home-Shirt-Front-700x700-1.jpg" },
-  { id: 2, name: "Manchester United Home Jersey", team: "Manchester United", price: 15000, image: "https://www.fanbase.co.ke/image/cache/catalog/17-18%20football%20season/man%20u/men/24-25/Manchester-United-Home-Football-Shirt-24-25-600x600.jpg" },
-  { id: 3, name: "Arsenal Home Jersey", team: "Arsenal", price: 14000, image: "https://assets.adidas.com/images/w_1880,f_auto,q_auto/6b542a9c1b51491f9cdc9700fba1d7b3_9366/IT6140_HM30.jpg" },
-  { id: 4, name: "Liverpool Home Jersey", team: "Liverpool", price: 16000, image: "https://havencraft.co.ke/wp-content/uploads/2024/08/LFC-2425-Home-1-700x700-1.jpeg" },
-  { id: 5, name: "Chelsea Home Jersey", team: "Chelsea", price: 13500, image: Image },
-  { id: 6, name: "Tottenham Hotspur Home Jersey", team: "Tottenham Hotspur", price: 13000, image: Image },
-  { id: 7, name: "Manchester City Away Jersey", team: "Manchester City", price: 14500, image: Image },
-  { id: 8, name: "Manchester United Away Jersey", team: "Manchester United", price: 15000, image: Image },
-  { id: 9, name: "Arsenal Away Jersey", team: "Arsenal", price: 14000, image: Image },
-  { id: 10, name: "Liverpool Away Jersey", team: "Liverpool", price: 16000, image: Image },
-  { id: 11, name: "Chelsea Away Jersey", team: "Chelsea", price: 13500, image: Image },
-  { id: 12, name: "Tottenham Hotspur Away Jersey", team: "Tottenham Hotspur", price: 13000, image: Image },
-  { id: 13, name: "Manchester City Third Jersey", team: "Manchester City", price: 15000, image: Image }
+  { id: 1, name: "Manchester City Home Jersey", team: "Manchester City", price: 12000, type: "home", image: "https://havencraft.co.ke/wp-content/uploads/2024/08/MCFC-24-25-Home-Shirt-Front-700x700-1.jpg" },
+  { id: 2, name: "Manchester United Home Jersey", team: "Manchester United", price: 15000, type: "home", image: "https://www.fanbase.co.ke/image/cache/catalog/17-18%20football%20season/man%20u/men/24-25/Manchester-United-Home-Football-Shirt-24-25-600x600.jpg" },
+  { id: 3, name: "Arsenal Home Jersey", team: "Arsenal", price: 14000, type: "home", image: "https://assets.adidas.com/images/w_1880,f_auto,q_auto/6b542a9c1b51491f9cdc9700fba1d7b3_9366/IT6140_HM30.jpg" },
+  { id: 4, name: "Liverpool Home Jersey", team: "Liverpool", price: 16000, type: "home", image: "https://havencraft.co.ke/wp-content/uploads/2024/08/LFC-2425-Home-1-700x700-1.jpeg" },
+  { id: 5, name: "Chelsea Home Jersey", team: "Chelsea", price: 13500, type: "home", image: Image },
+  { id: 6, name: "Tottenham Hotspur Home Jersey", team: "Tottenham Hotspur", price: 13000, type: "home", image: Image },
+  { id: 7, name: "Manchester City Away Jersey", team: "Manchester City", price: 14500, type: "away", image: Image },
+  { id: 8, name: "Manchester United Away Jersey", team: "Manchester United", price: 15000, type: "away", image: Image },
+  { id: 9, name: "Arsenal Away Jersey", team: "Arsenal", price: 14000, type: "away", image: Image },
+  { id: 10, name: "Liverpool Away Jersey", team: "Liverpool", price: 16000, type: "away", image: Image },
+  { id: 11, name: "Chelsea Away Jersey", team: "Chelsea", price: 13500, type: "away", image: Image },
+  { id: 12, name: "Tottenham Hotspur Away Jersey", team: "Tottenham Hotspur", price: 13000, type: "away", image: Image },
+  { id: 13, name: "Manchester City Third Jersey", team: "Manchester City", price: 15000, type: "third", image: Image }
 ];
+
 
 function RelatedProduct({ team, percentOff }) {
   const relatedJerseys = jerseys.filter(jersey => jersey.team === team);
+  console.log("Filtered Jerseys:", relatedJerseys); 
+  
+  const uniqueJerseys = [];
+  const seenTypes = new Set();
+
+  relatedJerseys.forEach(jersey => {
+    if (!seenTypes.has(jersey.type)) {
+      uniqueJerseys.push(jersey);
+      seenTypes.add(jersey.type);
+    }
+  });
+
   const price = 10000;
   let offPrice = `${price} Ks`;
 
@@ -31,7 +44,7 @@ function RelatedProduct({ team, percentOff }) {
     );
   }
 
-  return relatedJerseys.map((jersey) => (
+  return uniqueJerseys.map((jersey) => (
     <Link
       key={jersey.id}
       to={`/products/${jersey.id}`}

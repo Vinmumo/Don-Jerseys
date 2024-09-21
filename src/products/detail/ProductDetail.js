@@ -97,9 +97,8 @@ function ProductDetail() {
           <hr />
           <h4 className="text-muted my-4">Related products</h4>
           <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3">
-            {Array.from({ length: 3 }, (_, i) => (
-              <RelatedProduct key={i} team={team} percentOff={i % 2 === 0 ? 15 : null} />
-            ))}
+            {/* Pass the team dynamically to RelatedProduct */}
+            <RelatedProduct team={team} percentOff={15} />
           </div>
         </div>
       </div>
