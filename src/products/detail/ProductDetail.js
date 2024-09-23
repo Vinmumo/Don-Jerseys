@@ -9,7 +9,7 @@ const iconPath = "M18.571 7.221c0 0.201-0.145 0.391-0.29 0.536l-4.051 3.951 0.96
 
 function ProductDetail() {
   const location = useLocation();
-  const { image, name, price, description, team } = location.state || {}; // Fallback to an empty object if no state
+  const { image, name, price, description, team } = location.state || {};
 
   function changeRating(newRating) {}
 

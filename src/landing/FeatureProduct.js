@@ -14,16 +14,14 @@ function FeatureProduct({ image, name, team, price, id }) {
           <h5 className="card-title text-center">{name}</h5>
           <p className="card-text text-center text-muted">{price} Ks</p>
           <div className="d-grid gap-2">
-            <Link
-              to={{
-                pathname: `/products/${id}`,
-                state: { image, name, team, price, description: 'Jersey description here' } // Pass additional details
-              }}
-              className="btn btn-outline-dark"
-              replace
-            >
-              Details
-            </Link>
+          <Link to={{
+                  pathname: `/products/${id}`,
+                  state: { image, name, team, price, description: 'Jersey description here' }
+                }}
+                className="btn btn-outline-dark"
+              >
+                Details
+              </Link>
           </div>
         </div>
       </div>
