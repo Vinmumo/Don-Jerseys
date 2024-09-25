@@ -148,8 +148,16 @@ function ProductList() {
                         <h5 className="card-title text-center">{product.name}</h5>
                         <p className="card-text text-center text-muted">{product.price} Ks</p>
                         <div className="d-grid gap-2">
-                          <Link
+                        <Link
                             to={`/products/${product.id}`}
+                            state={{ 
+                              id:product.id,
+                              name: product.name, 
+                              image: product.image_url, 
+                              price: product.price, 
+                              description: product.description, 
+                              team: product.team 
+                            }}
                             className="btn btn-outline-dark"
                             replace
                           >

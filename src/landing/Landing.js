@@ -42,6 +42,7 @@ function Landing() {
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-md-5">
           {products.length > 0 ? products.map(product => (
             <FeatureProduct
+              product={product}
               key={product.id}
               id={product.id}
               image={product.image_url} 

@@ -1,109 +1,99 @@
-import { useLocation } from "react-router-dom";
-import RelatedProduct from "./RelatedProduct";
-import Ratings from "react-ratings-declarative";
-import ScrollToTopOnMount from "../../template/ScrollToTopOnMount";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import RelatedProduct from './RelatedProduct';
+import ProductDetailsHeader from './ProductDetailsHeader';
+import './ProductDetails.css';
 
-const iconPath = "M18.571 7.221c0 0.201-0.145 0.391-0.29 0.536l-4.051 3.951 0.96 5.58c0.011 0.078 0.011 0.145 0.011 0.223 0 0.29-0.134 0.558-0.458 0.558-0.156 0-0.313-0.056-0.446-0.134l-5.011-2.634-5.011 2.634c-0.145 0.078-0.29 0.134-0.446 0.134-0.324 0-0.469-0.268-0.469-0.558 0-0.078 0.011-0.145 0.022-0.223l0.96-5.58-4.063-3.951c-0.134-0.145-0.279-0.335-0.279-0.536 0-0.335 0.346-0.469 0.625-0.513l5.603-0.815 2.511-5.078c0.1-0.212 0.29-0.458 0.547-0.458s0.446 0.246 0.547 0.458l2.511 5.078 5.603 0.815c0.268 0.045 0.625 0.179 0.625 0.513z";
+function ProductDetails() {
+  const { id } = useParams(); // Get the product id from the URL
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    fetch(`http://127.0.0.1:5000/products/${id}`)
+      .then(response => response.json())
+      .then(data => {
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        setError('Failed to load product details.');
+        setLoading(false);
+      });
+  }, [id]);
 
-function ProductDetail() {
-  const location = useLocation();
-  const { image, name, price, description, team } = location.state || {};
+  if (loading) {
+    return <div className="text-center my-5">Loading...</div>;
+  }
 
-  function changeRating(newRating) {}
+  if (error) {
+    return <div className="alert alert-danger">{error}</div>;
+  }
+
+  if (!product) {
+    return <div className="text-center my-5">Product not found</div>;
+  }
+
+  const { name, image_url, price, description, stock } = product;
 
   return (
-    <div className="container mt-5 py-4 px-xl-5">
-      <ScrollToTopOnMount />
-      <nav aria-label="breadcrumb" className="bg-custom-light rounded mb-4">
-        <ol className="breadcrumb p-3">
-          <li className="breadcrumb-item">
-            <Link className="text-decoration-none link-secondary" to="/products">
-              All Products
-            </Link>
-          </li>
-          <li className="breadcrumb-item active" aria-current="page">
-            {name || "Product Name"} {/* Use dynamic name */}
-          </li>
-        </ol>
-      </nav>
-
-      <div className="row mb-4">
+    <>
+    <ProductDetailsHeader />
+    <div className="container product-details mt-5">
+      <div className="row">
         <div className="col-lg-6">
-          <img className="border rounded ratio ratio-1x1" alt={name} src={image} />
+          <img src={image_url} alt={name} className="img-fluid product-image" />
         </div>
+        <div className="col-lg-6">
+          <h1 className="product-name">{name}</h1>
+          <p className="product-price">{price} Ksh</p>
+          <p className="product-description">{description}</p>
 
-        <div className="col-lg-5">
-          <div className="d-flex flex-column h-100">
-            <h2 className="mb-1">{name}</h2>
-            <h4 className="text-muted mb-4">{price} Ks</h4>
+          <div className="d-grid gap-2 my-4">
+            <button className="btn btn-dark btn-lg" disabled={stock <= 0}>
+              {stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+            </button>
+            <button className="btn btn-outline-secondary btn-lg">Wishlist</button>
+          </div>
 
-            <div className="row g-3 mb-4">
-              <div className="col">
-                <button className="btn btn-outline-dark py-2 w-100">
-                  Add to cart
-                </button>
-              </div>
-              <div className="col">
-                <button className="btn btn-dark py-2 w-100">Buy now</button>
-              </div>
-            </div>
-
-            <h4 className="mb-0">Details</h4>
-            <hr />
-            <dl className="row">
-              <dt className="col-sm-4">Category</dt>
-              <dd className="col-sm-8 mb-3">Jersey</dd>
-
-              <dt className="col-sm-4">Brand</dt>
-              <dd className="col-sm-8 mb-3">Sports Brand</dd>
-
-              <dt className="col-sm-4">Status</dt>
-              <dd className="col-sm-8 mb-3">In stock</dd>
-
-              <dt className="col-sm-4">Rating</dt>
-              <dd className="col-sm-8 mb-3">
-                <Ratings
-                  rating={4.5}
-                  widgetRatedColors="rgb(253, 204, 13)"
-                  changeRating={changeRating}
-                  widgetSpacings="2px"
-                >
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <Ratings.Widget
-                      key={i}
-                      widgetDimension="20px"
-                      svgIconViewBox="0 0 19 20"
-                      svgIconPath={iconPath}
-                    />
-                  ))}
-                </Ratings>
-              </dd>
-            </dl>
-
-            <h4 className="mb-0">Description</h4>
-            <hr />
-            <p className="lead flex-shrink-0">
-              <small>{description}</small>
-            </p>
+          <div className="stock-status">
+            {stock > 0 ? (
+              <span className="text-success">In Stock</span>
+            ) : (
+              <span className="text-danger">Out of Stock</span>
+            )}
           </div>
         </div>
       </div>
 
       {/* Related Products Section */}
-      <div className="row">
-        <div className="col-md-12 mb-4">
-          <hr />
-          <h4 className="text-muted my-4">Related products</h4>
-          <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3">
-            {/* Pass the team dynamically to RelatedProduct */}
-            <RelatedProduct team={team} percentOff={15} />
+      <div className="row my-5">
+        <h3 className="text-center mb-4">Related Products</h3>
+        <div className="col-lg-12">
+          <div className="row related-products">
+            <RelatedProduct keyword={name.toLowerCase()} currentProductId={id} />
           </div>
         </div>
       </div>
+
+      {/* Customer Reviews Section */}
+      <div className="row my-5">
+        <h3 className="text-center mb-4">Customer Reviews</h3>
+        <div className="col-lg-8 offset-lg-2">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Review by John Doe</h5>
+              <p className="card-text">Great product! I'm very satisfied with the quality.</p>
+              <p className="text-muted">Rating: ★★★★☆</p>
+            </div>
+          </div>
+          {/* Add more reviews here */}
+        </div>
+      </div>
     </div>
+    </>
   );
 }
 
-export default ProductDetail;
+export default ProductDetails;
