@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import RelatedProduct from './RelatedProduct';
-import ProductDetailsHeader from './ProductDetailsHeader';
+import CartContext from '../../CartContext';
 import './ProductDetails.css';
 
-function ProductDetails() {
-  const { id } = useParams(); // Get the product id from the URL
+function ProductDetail() {
+  const { id } = useParams(); 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { addToCart } = useContext(CartContext); 
 
   useEffect(() => {
     fetch(`http://127.0.0.1:5000/products/${id}`)
@@ -38,8 +40,6 @@ function ProductDetails() {
   const { name, image_url, price, description, stock } = product;
 
   return (
-    <>
-    <ProductDetailsHeader />
     <div className="container product-details mt-5">
       <div className="row">
         <div className="col-lg-6">
@@ -51,7 +51,11 @@ function ProductDetails() {
           <p className="product-description">{description}</p>
 
           <div className="d-grid gap-2 my-4">
-            <button className="btn btn-dark btn-lg" disabled={stock <= 0}>
+            <button
+              className="btn btn-dark btn-lg"
+              disabled={stock <= 0}
+              onClick={() => addToCart(product)}
+            >
               {stock > 0 ? 'Add to Cart' : 'Out of Stock'}
             </button>
             <button className="btn btn-outline-secondary btn-lg">Wishlist</button>
@@ -67,7 +71,6 @@ function ProductDetails() {
         </div>
       </div>
 
-      {/* Related Products Section */}
       <div className="row my-5">
         <h3 className="text-center mb-4">Related Products</h3>
         <div className="col-lg-12">
@@ -77,7 +80,6 @@ function ProductDetails() {
         </div>
       </div>
 
-      {/* Customer Reviews Section */}
       <div className="row my-5">
         <h3 className="text-center mb-4">Customer Reviews</h3>
         <div className="col-lg-8 offset-lg-2">
@@ -88,12 +90,10 @@ function ProductDetails() {
               <p className="text-muted">Rating: ★★★★☆</p>
             </div>
           </div>
-          {/* Add more reviews here */}
         </div>
       </div>
     </div>
-    </>
   );
 }
 
-export default ProductDetails;
+export default ProductDetail;

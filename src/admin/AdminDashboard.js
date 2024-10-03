@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './AdminDashboard.css';
 import MultiStepForm from './MultiStepForm';
 
-const AdminDashboard = () => {
+const AdminDashboard = ({addToCart}) => {
+  console.log(addToCart)
   const [showForm, setShowForm] = useState(false);
   const [categoryCounts, setCategoryCounts] = useState([]); // Array instead of object
   const [activeCategory, setActiveCategory] = useState(null);
