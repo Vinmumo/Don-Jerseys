@@ -5,11 +5,21 @@ import CartContext from '../../CartContext';
 import Modal from 'react-bootstrap/Modal';
 
 function ProductDetailsHeader() {
-  const { cart, removeFromCart } = useContext(CartContext); 
+  const { cart, removeFromCart, updateQuantity } = useContext(CartContext); 
   const [showCart, setShowCart] = useState(false);
 
   function toggleCart() {
     setShowCart(!showCart);
+  }
+
+  function handleQuantityChange(productId, newQuantity, stock) {
+    if (newQuantity > stock) {
+      alert(`You can only order up to ${stock} units.`);
+    } else if (newQuantity < 1) {
+      alert('Quantity must be at least 1.');
+    } else {
+      updateQuantity(productId, newQuantity);
+    }
   }
 
   return (
@@ -50,7 +60,16 @@ function ProductDetailsHeader() {
                 <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                   <div>
                     <div>{item.name}</div>
-                    <div>Quantity: {item.quantity}</div>
+                    <div>
+                      Quantity: 
+                      <input 
+                        type="number" 
+                        value={item.quantity} 
+                        min="1" 
+                        max={item.stock} 
+                        onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value), item.stock)} 
+                      />
+                    </div>
                     <div>Price: ${item.price}</div>
                   </div>
                   <button
