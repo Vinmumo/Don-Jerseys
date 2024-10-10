@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
 import AuthModal from '../user/AuthModal';
@@ -7,6 +7,15 @@ function Header() {
   const [openedDrawer, setOpenedDrawer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSignup, setIsSignup] = useState(false); // Determines if modal is for login or signup
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check if user is logged in by looking for user data in localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   function toggleDrawer() {
     setOpenedDrawer(!openedDrawer);
@@ -32,6 +41,21 @@ function Header() {
     setShowAuthModal(false);
   }
 
+  function handleLogout() {
+    const storedUser = JSON.parse(localStorage.getItem('user')); // Get the current user data
+  
+    // Clear user data from localStorage and update state
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  
+    // Clear the cart associated with the user, if any
+    if (storedUser && storedUser.id) {
+      localStorage.removeItem(`${storedUser.id}_cart`); // Clear the cart for the current user
+    }
+  
+    setUser(null); // Update state to reflect that the user is logged out
+  }
+
   return (
     <>
       <header>
@@ -50,10 +74,13 @@ function Header() {
                   </Link>
                 </li>
               </ul>
+
+              {/* Display Cart Button */}
               <button type="button" className="btn btn-outline-dark me-3 d-none d-lg-inline">
                 <FontAwesomeIcon icon={['fas', 'shopping-cart']} />
                 <span className="ms-3 badge rounded-pill bg-dark">0</span>
               </button>
+
               <ul className="navbar-nav mb-2 mb-lg-0">
                 <li className="nav-item dropdown">
                   <a
@@ -67,16 +94,31 @@ function Header() {
                     <FontAwesomeIcon icon={['fas', 'user-alt']} />
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li>
-                      <button className="dropdown-item" onClick={openLoginModal}>
-                        Login
-                      </button>
-                    </li>
-                    <li>
-                      <button className="dropdown-item" onClick={openSignupModal}>
-                        Sign Up
-                      </button>
-                    </li>
+                    {user ? (
+                      <>
+                        <li>
+                          <p className="dropdown-item">Welcome, {user.username}</p>
+                        </li>
+                        <li>
+                          <button className="dropdown-item" onClick={handleLogout}>
+                            Logout
+                          </button>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li>
+                          <button className="dropdown-item" onClick={openLoginModal}>
+                            Login
+                          </button>
+                        </li>
+                        <li>
+                          <button className="dropdown-item" onClick={openSignupModal}>
+                            Sign Up
+                          </button>
+                        </li>
+                      </>
+                    )}
                   </ul>
                 </li>
               </ul>

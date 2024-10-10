@@ -4,14 +4,17 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
-    // Get the cart from localStorage if it exists
-    const savedCart = localStorage.getItem('cart');
+    const user = JSON.parse(localStorage.getItem('user')); // Get current user
+    const savedCart = localStorage.getItem(`${user?.id}_cart`); // Cart tied to the user ID
     return savedCart ? JSON.parse(savedCart) : [];
   });
 
   useEffect(() => {
-    // Save cart to localStorage whenever it changes
-    localStorage.setItem('cart', JSON.stringify(cart));
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      // Save cart to localStorage tied to the current user
+      localStorage.setItem(`${user.id}_cart`, JSON.stringify(cart));
+    }
   }, [cart]);
 
   const addToCart = (product, quantity = 1) => {
