@@ -19,7 +19,7 @@ function FeatureProduct({ product, image, name, price, id }) {
                state={{ 
                  id:product.id,
                  name: product.name, 
-                 image: product.image_url, 
+                 image: product.image_url,
                  price: product.price, 
                  description: product.description, 
                  team: product.team 
