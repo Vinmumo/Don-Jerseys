@@ -1,21 +1,38 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AuthModal from '../user/AuthModal';
 
 function Header() {
   const [openedDrawer, setOpenedDrawer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isSignup, setIsSignup] = useState(false); // Determines if modal is for login or signup
+  const [isSignup, setIsSignup] = useState(false);
   const [user, setUser] = useState(null);
+  const [showBackButton, setShowBackButton] = useState(false);
+  const [previousPath, setPreviousPath] = useState(null);
+
+  const location = useLocation(); // Get current location
+  const navigate = useNavigate(); // Hook to navigate programmatically
 
   useEffect(() => {
-    // Check if user is logged in by looking for user data in localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-  }, []);
+
+    // Store the current path as previous path before navigation
+    if (location.pathname !== "/") {
+      setShowBackButton(true);
+    } else {
+      setShowBackButton(false);
+    }
+
+    // Store previous path in state
+    const previousLocation = location.state?.from || "/";
+    if (location.pathname !== previousLocation) {
+      setPreviousPath(previousLocation);
+    }
+  }, [location]);
 
   function toggleDrawer() {
     setOpenedDrawer(!openedDrawer);
@@ -42,18 +59,26 @@ function Header() {
   }
 
   function handleLogout() {
-    const storedUser = JSON.parse(localStorage.getItem('user')); // Get the current user data
-  
-    // Clear user data from localStorage and update state
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+
+    // Clear user data
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-  
-    // Clear the cart associated with the user, if any
+
     if (storedUser && storedUser.id) {
-      localStorage.removeItem(`${storedUser.id}_cart`); // Clear the cart for the current user
+      localStorage.removeItem(`${storedUser.id}_cart`);
     }
-  
-    setUser(null); // Update state to reflect that the user is logged out
+
+    setUser(null);
+  }
+
+  // Handle back button click
+  function handleBackClick() {
+    if (previousPath) {
+      navigate(previousPath); // Navigate to the previous path stored in state
+    } else {
+      navigate("/"); // Fallback to landing page if no previous path is available
+    }
   }
 
   return (
@@ -75,11 +100,21 @@ function Header() {
                 </li>
               </ul>
 
-              {/* Display Cart Button */}
-              <button type="button" className="btn btn-outline-dark me-3 d-none d-lg-inline">
-                <FontAwesomeIcon icon={['fas', 'shopping-cart']} />
-                <span className="ms-3 badge rounded-pill bg-dark">0</span>
-              </button>
+              <div className="d-flex">
+                {/* Conditionally render Back Button */}
+                {showBackButton && (
+                  <button type="button" className="btn btn-outline-secondary me-3" onClick={handleBackClick}>
+                    <FontAwesomeIcon icon={['fas', 'arrow-left']} />
+                    Back
+                  </button>
+                )}
+
+                {/* Cart Button */}
+                <button type="button" className="btn btn-outline-dark me-3 d-none d-lg-inline">
+                  <FontAwesomeIcon icon={['fas', 'shopping-cart']} />
+                  <span className="ms-3 badge rounded-pill bg-dark">0</span>
+                </button>
+              </div>
 
               <ul className="navbar-nav mb-2 mb-lg-0">
                 <li className="nav-item dropdown">

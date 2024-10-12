@@ -1,19 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import './AdminDashboard.css';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import MultiStepForm from './MultiStepForm';
+import RegisterAdminForm from './RegisterAdminForm'; 
+import './AdminDashboard.css';
 
-const AdminDashboard = ({addToCart}) => {
-  console.log(addToCart)
+const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
-  const [categoryCounts, setCategoryCounts] = useState([]); // Array instead of object
+  const [showAdminForm, setShowAdminForm] = useState(false); // For toggling admin form
+  const [categoryCounts, setCategoryCounts] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
   const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const isAdmin = localStorage.getItem('isAdmin');
+    if (!isAdmin) {
+      navigate('/');
+    }
+  }, [navigate]);
 
   const handleFormToggle = () => {
     setShowForm(!showForm);
   };
 
-  // Fetch product counts by category
+  const handleAdminFormToggle = () => {
+    setShowAdminForm(!showAdminForm);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAdmin');
+    navigate('/');
+  };
+
   useEffect(() => {
     fetch('http://127.0.0.1:5000/products/count-by-category')
       .then((response) => response.json())
@@ -21,7 +42,6 @@ const AdminDashboard = ({addToCart}) => {
       .catch((error) => console.error('Error fetching category counts:', error));
   }, []);
 
-  // Fetch products by category when a category is clicked
   const handleCategoryClick = (categoryId) => {
     if (activeCategory === categoryId) {
       setActiveCategory(null);
@@ -37,7 +57,10 @@ const AdminDashboard = ({addToCart}) => {
 
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+      <header className="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </header>
 
       <div className="dashboard-section">
         <h2>Manage Products</h2>
@@ -99,6 +122,16 @@ const AdminDashboard = ({addToCart}) => {
             </div>
           )}
         </div>
+
+        <button className="toggle-form-btn" onClick={handleAdminFormToggle}>
+          {showAdminForm ? 'Hide Admin Form' : 'Register New Admin'}
+        </button>
+
+        {showAdminForm && (
+          <div className="admin-form-section">
+            <RegisterAdminForm />
+          </div>
+        )}
       </div>
     </div>
   );

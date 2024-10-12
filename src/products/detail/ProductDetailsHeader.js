@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import CartContext from '../../CartContext'; 
 import Modal from 'react-bootstrap/Modal';
@@ -7,6 +7,32 @@ import Modal from 'react-bootstrap/Modal';
 function ProductDetailsHeader() {
   const { cart, removeFromCart, updateQuantity } = useContext(CartContext); 
   const [showCart, setShowCart] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showBackButton, setShowBackButton] = useState(false);
+  const [previousPath, setPreviousPath] = useState(null);
+
+  const location = useLocation(); // Get current location
+  const navigate = useNavigate(); // Hook to navigate programmatically
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    // Show back button if the current path is not the landing page ("/")
+    if (location.pathname !== "/") {
+      setShowBackButton(true);
+    } else {
+      setShowBackButton(false);
+    }
+
+    // Store previous path
+    const previousLocation = location.state?.from || "/";
+    if (location.pathname !== previousLocation) {
+      setPreviousPath(previousLocation);
+    }
+  }, [location]);
 
   function toggleCart() {
     setShowCart(!showCart);
@@ -22,6 +48,14 @@ function ProductDetailsHeader() {
     }
   }
 
+  function handleBackClick() {
+    if (previousPath) {
+      navigate(previousPath); // Navigate to the previous path stored in state
+    } else {
+      navigate("/"); // Fallback to landing page if no previous path is available
+    }
+  }
+
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom">
@@ -33,6 +67,14 @@ function ProductDetailsHeader() {
           </Link>
 
           <div className="ms-auto">
+            {/* Conditionally render Back Button */}
+            {showBackButton && (
+              <button type="button" className="btn btn-outline-secondary me-3" onClick={handleBackClick}>
+                <FontAwesomeIcon icon={['fas', 'arrow-left']} />
+                Back
+              </button>
+            )}
+
             {/* Shopping Cart */}
             <button
               type="button"

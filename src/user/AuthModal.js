@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import './AuthModal.css';
 
 function AuthModal({ isOpen, onClose }) {
@@ -9,6 +10,7 @@ function AuthModal({ isOpen, onClose }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -18,16 +20,25 @@ function AuthModal({ isOpen, onClose }) {
       if (isSignup) {
         const response = await axios.post('http://127.0.0.1:5000/signup', { username, email, password });
         if (response.data.message === "User registered successfully") {
-          onClose(); 
+          onClose();
         } else {
           setError(response.data.message);
         }
       } else {
         const response = await axios.post('http://127.0.0.1:5000/login', { identifier, password });
         if (response.data.access_token) {
-          // Store JWT and user details
+          // Store JWT, user details, and admin status
           localStorage.setItem('token', response.data.access_token);
           localStorage.setItem('user', JSON.stringify(response.data.user));
+
+          if (response.data.user.is_admin) {
+            localStorage.setItem('isAdmin', 'true');
+            navigate('/admin/dashboard');  // Navigate to admin dashboard
+          } else {
+            localStorage.removeItem('isAdmin');
+            navigate('/');  
+          }
+
           onClose();
         } else {
           setError(response.data.message);
