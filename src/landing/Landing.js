@@ -3,6 +3,7 @@ import Banner from "./Banner";
 import FeatureProduct from "./FeatureProduct";
 import ScrollToTopOnMount from "../template/ScrollToTopOnMount";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import "./landing.css";
 import { Link } from "react-router-dom";
 import Header from "../template/Header";
 import Footer from "../template/Footer";
@@ -27,7 +28,7 @@ function Landing() {
       <Header />
       <ScrollToTopOnMount />
       <Banner />
-      <div className="d-flex flex-column bg-white py-4">
+      <div className="d-flex flex-column bg-orange py-4">
         <p className="text-center px-5">
           We are Located at Nairobi CBD.
         </p>
@@ -37,8 +38,8 @@ function Landing() {
           </Link>
         </div>
       </div>
-      <h2 className="text-muted text-center mt-4 mb-3">New Arrival</h2>
-      <div className="container pb-5 px-lg-5">
+      <h2 className="text-muted text-center new-arrival-title">New Arrival</h2>
+      <div className="containern bg-orange pb-5 px-lg-5">
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-md-5">
           {products.length > 0 ? products.map(product => (
             <FeatureProduct
@@ -53,7 +54,7 @@ function Landing() {
           )) : <p>Loading...</p>}
         </div>
       </div>
-      <div className="d-flex flex-column bg-white py-4">
+      <div className="d-flex flex-column bg-orange py-4">
         <h5 className="text-center mb-3">Follow us on</h5>
         <div className="d-flex justify-content-center">
           <a href="!#" className="me-3">

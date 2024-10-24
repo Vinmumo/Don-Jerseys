@@ -1,0 +1,79 @@
+/* General Styling */
+.bg-orange {
+    background-color: #FFA500; /* Example orange shade */
+    color: #fff;
+  }
+  
+  /* Styling for text sections */
+  .text-section {
+    padding: 2rem 1rem;
+    text-align: center;
+    font-size: 1.2rem;
+  }
+  
+  /* Button Styling */
+  .btn-primary {
+    background-color: #FF4500;
+    border-color: #FF4500;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #FF6347;
+    transform: scale(1.05);
+  }
+  
+  /* Product Grid Styling */
+  .container {
+    margin-top: 1rem;
+  }
+  
+  .row-cols-1 .col {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  /* Social Media Links */
+  .social-icons a {
+    color: #fff;
+    margin: 0 1rem;
+    transition: color 0.3s;
+  }
+  
+  .social-icons a:hover {
+    color: #FF4500;
+  }
+  
+  /* New Arrival Section */
+  .new-arrival-heading {
+    font-weight: bold;
+    color: #dd4b16;
+  }
+  
+  /* Remove margin from h2 and add padding */
+  .new-arrival-title {
+    background-color: #FFA500; /* Match background color */
+    padding: 1rem 0;
+    margin: 0; /* Remove default margin */
+  }
+  
+  /* Footer Styling */
+  footer {
+    background-color: #343a40;
+    color: #fff;
+    padding: 1.5rem 0;
+    text-align: center;
+  }
+  
+  footer a {
+    color: #FF4500;
+    text-decoration: none;
+    margin: 0 0.5rem;
+  }
+  
+  footer a:hover {
+    text-decoration: underline;
+  }
+  

@@ -1,0 +1,127 @@
+/* Full-width background styling */
+.container-full-width {
+    width: 100%;
+    background-color: #FFA500; /* Orange background */
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Main content container for centered alignment */
+  .main-content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  /* Filter Menu Styling */
+  .list-group {
+    background-color: #fff;
+  }
+  
+  .list-group-item {
+    background-color: #f8f9fa;
+    border: none;
+  }
+  
+  .list-group-item h5 {
+    color: #333;
+  }
+  
+  .btn-outline-dark.active {
+    background-color: #333;
+    color: #fff;
+  }
+  
+  /* Product Card Styles */
+  .card {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .card-img-top {
+    object-fit: cover;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  
+  /* Typography adjustments */
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .card-text {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  /* Search and Button Controls */
+  .input-group .form-control {
+    border-right: none;
+  }
+  
+  .input-group .btn {
+    border-left: none;
+  }
+  
+  .btn-outline-dark {
+    border-color: #6c757d;
+    color: #6c757d;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-dark:hover {
+    background-color: #6c757d;
+    color: #fff;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .product-title {
+      font-size: 1.5rem;
+    }
+  
+    .product-price {
+      font-size: 1.25rem;
+    }
+  
+    .card-text {
+      font-size: 0.9rem;
+    }
+  
+    .btn-outline-dark {
+      font-size: 0.9rem;
+    }
+  }
+  
+  /* Miscellaneous styling */
+  .mb-4 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .mt-5 {
+    margin-top: 3rem;
+  }
+  
+  .py-4 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .px-xl-5 {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
+
+
+.form-control{
+    background-color: #FFA500;
+}
