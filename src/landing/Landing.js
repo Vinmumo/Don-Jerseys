@@ -55,20 +55,24 @@ function Landing() {
         </div>
       </div>
       <div className="d-flex flex-column bg-orange py-4">
-        <h5 className="text-center mb-3">Follow us on</h5>
-        <div className="d-flex justify-content-center">
-          <a href="!#" className="me-3">
-            <FontAwesomeIcon icon={["fab", "facebook"]} size="2x" />
-          </a>
-          <a href="!#">
-            <FontAwesomeIcon icon={["fab", "instagram"]} size="2x" />
-          </a>
-          <a href="!#" className="ms-3">
-            <FontAwesomeIcon icon={["fab", "twitter"]} size="2x" />
-          </a>
-        </div>
-      </div>
-      <Footer />
+  <h5 className="text-center mb-3">Follow us on</h5>
+  <div className="d-flex justify-content-center">
+    <a href="https://www.facebook.com/share/CqwB5khNSw5mJ4Km/" className="me-3" target="_blank" rel="noopener noreferrer">
+      <FontAwesomeIcon icon={["fab", "facebook"]} size="2x" />
+    </a>
+    <a href="https://www.instagram.com/don_jersey_sportshouse?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">
+      <FontAwesomeIcon icon={["fab", "instagram"]} size="2x" />
+    </a>
+    <a href="https://x.com/_Its_Dickie?t=4r4yFhC7La4huG1dvkea3A&s=09" className="ms-3" target="_blank" rel="noopener noreferrer">
+      <FontAwesomeIcon icon={["fab", "twitter"]} size="2x" />
+    </a>
+    <a href="https://www.tiktok.com/@don_jersey_sportshouse?_t=8qoEEjvusxq&_r=1" className="ms-3" target="_blank" rel="noopener noreferrer">
+      <FontAwesomeIcon icon={["fab", "tiktok"]} size="2x" />
+    </a>
+  </div>
+</div>
+
+      {/* <Footer /> */}
     </>
   );
 }

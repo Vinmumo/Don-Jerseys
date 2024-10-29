@@ -14,10 +14,12 @@ function FilterMenuLeft({ categories, selectedCategory, setSelectedCategory }) {
           {categories.map((category, i) => (
             <button
               key={i}
-              className={`btn btn-sm btn-outline-dark rounded-pill me-2 mb-2 ${selectedCategory === category ? "active" : ""}`}
+              className={`btn btn-sm btn-outline-dark rounded-pill me-2 mb-2 ${
+                selectedCategory === category ? "active" : ""
+              }`}
               onClick={() => setSelectedCategory(category)}
             >
-              {category}
+              {category} {/* Use category directly here as it should now be a string */}
             </button>
           ))}
         </div>
@@ -30,9 +32,19 @@ function ProductList() {
   const [viewType, setViewType] = useState({ grid: true });
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories, setCategories] = useState(["All Products", "Jerseys", "Sportswear", "Gym Equipment"]);
+  const [categories, setCategories] = useState(["All Products"]); // Start with default "All Products"
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Fetch categories from the backend
+  useEffect(() => {
+    fetch("http://127.0.0.1:5000/categories")
+      .then((response) => response.json())
+      .then((data) => {
+        setCategories(["All Products", ...data.map((category) => category.name)]);
+      })
+      .catch((error) => console.error("Error fetching categories:", error));
+  }, []);
 
   // Fetch products 
   useEffect(() => {
@@ -40,7 +52,6 @@ function ProductList() {
       .then((response) => response.json())
       .then((data) => {
         setProducts(data);
-        // console.log(data);
         setFilteredProducts(data); // Set filtered products initially to all products
       })
       .catch((error) => console.error("Error fetching products:", error));
@@ -178,8 +189,6 @@ function ProductList() {
                     <p className="text-center">No products available.</p>
                   )}
                 </div>
-  
-                {/* Pagination (if needed) */}
               </div>
             </div>
           </div>

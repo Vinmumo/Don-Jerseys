@@ -11,24 +11,21 @@ const MultiStepForm = () => {
     stock: '',
     imageUrl: ''
   });
-  const [imageFile, setImageFile] = useState(null); // For storing the selected image file
-  const [errors, setErrors] = useState({}); // For storing error messages
-  const [successMessage, setSuccessMessage] = useState(''); // State to control success message
+  const [imageFile, setImageFile] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
 
-  // Handle input change
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    setErrors({ ...errors, [name]: '' }); // Clear error for the field when it changes
+    setErrors({ ...errors, [name]: '' });
   };
 
-  // Handle image file change
-  const handleImageChange = e => {
+  const handleImageChange = (e) => {
     setImageFile(e.target.files[0]);
     setErrors({ ...errors, imageUrl: '' });
   };
 
-  // Validate the current step
   const validateStep = () => {
     const newErrors = {};
     if (step === 1) {
@@ -42,66 +39,79 @@ const MultiStepForm = () => {
       if (!imageFile) newErrors.imageUrl = 'Product image is required';
     }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+    return Object.keys(newErrors).length === 0;
   };
 
-  // Handle next step
   const nextStep = () => {
     if (validateStep()) {
       setStep(step + 1);
     }
   };
 
-  // Handle previous step
   const prevStep = () => setStep(step - 1);
 
-  // Form submit handler
   const handleSubmit = async () => {
     if (validateStep()) {
-      // Create form data for image upload
       const imageData = new FormData();
       imageData.append('file', imageFile);
-
+  
       try {
-        // Upload image to Cloudinary
         const response = await fetch('http://127.0.0.1:5000/upload', {
           method: 'POST',
           body: imageData,
         });
-
+  
         const imageUploadResult = await response.json();
-
-        if (response.ok) {
-          // Add image URL from Cloudinary to formData
-          const imageUrl = imageUploadResult.secure_url;
-          const productData = { ...formData, imageUrl };
-
-          const productResponse = await fetch('http://127.0.0.1:5000/products', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(productData),
-          });
-
-          if (productResponse.ok) {
-            setSuccessMessage('Product added successfully!'); // Show success message
-            setTimeout(() => {
-              window.location.reload(); // Refresh the page after 3 seconds
-            }, 3000);
-          }
+  
+        // Log the entire response to confirm
+        console.log('Image upload response:', imageUploadResult);
+  
+        if (response.ok && imageUploadResult.image_url) {
+          const imageUrl = imageUploadResult.image_url;
+          console.log('Uploaded image URL:', imageUrl);
+  
+          // Update formData with the uploaded image URL
+          const updatedFormData = { ...formData, imageUrl };
+  
+          // Submit product data with the updated imageUrl
+          submitProductData(updatedFormData);
         } else {
-          console.error('Failed to upload image:', imageUploadResult);
+          console.error('Failed to upload image or image_url missing:', imageUploadResult);
         }
       } catch (error) {
         console.error('Error submitting form:', error);
       }
     }
   };
+  
+  
+
+  const submitProductData = async (productData) => {
+    try {
+      const productResponse = await fetch('http://127.0.0.1:5000/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
+      });
+
+      if (productResponse.ok) {
+        setSuccessMessage('Product added successfully!');
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      } else {
+        console.error('Error submitting product data:', await productResponse.json());
+      }
+    } catch (error) {
+      console.error('Error submitting product data:', error);
+    }
+  };
 
   return (
     <>
-      {successMessage && <div className="success-popup">{successMessage}</div>} {/* Success popup */}
+      {successMessage && <div className="success-popup">{successMessage}</div>}
       
       {step === 1 && (
         <div className="form-container">

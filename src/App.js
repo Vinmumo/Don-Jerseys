@@ -8,6 +8,7 @@ import ProductList from './products/ProductList';
 import AdminDashboard from './admin/AdminDashboard';
 import LoginPage from './admin/LoginPage';
 import ProductDetailsHeader from './products/detail/ProductDetailsHeader';
+import OrderForm from './orders/OrderForm'; 
 import { CartProvider } from './CartContext'; 
 
 function App() {
@@ -51,6 +52,10 @@ function App() {
               <Footer />
             </>
           } 
+        />
+        <Route 
+          path="/order-form" 
+          element={<OrderForm />} 
         />
         <Route 
           path="*" 

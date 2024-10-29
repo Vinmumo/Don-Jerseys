@@ -11,8 +11,8 @@ function ProductDetailsHeader() {
   const [showBackButton, setShowBackButton] = useState(false);
   const [previousPath, setPreviousPath] = useState(null);
 
-  const location = useLocation(); // Get current location
-  const navigate = useNavigate(); // Hook to navigate programmatically
+  const location = useLocation(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -20,14 +20,12 @@ function ProductDetailsHeader() {
       setUser(JSON.parse(storedUser));
     }
 
-    // Show back button if the current path is not the landing page ("/")
     if (location.pathname !== "/") {
       setShowBackButton(true);
     } else {
       setShowBackButton(false);
     }
 
-    // Store previous path
     const previousLocation = location.state?.from || "/";
     if (location.pathname !== previousLocation) {
       setPreviousPath(previousLocation);
@@ -50,24 +48,27 @@ function ProductDetailsHeader() {
 
   function handleBackClick() {
     if (previousPath) {
-      navigate(previousPath); // Navigate to the previous path stored in state
+      navigate(previousPath);
     } else {
-      navigate("/"); // Fallback to landing page if no previous path is available
+      navigate("/");
     }
+  }
+
+  function handleOrderClick() {
+    setShowCart(false); // Close the cart modal
+    navigate("/order-form"); // Navigate to the OrderForm page
   }
 
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom">
         <div className="container-fluid">
-          {/* Brand/Logo */}
           <Link className="navbar-brand" to="/">
             <FontAwesomeIcon icon={["fab", "bootstrap"]} className="ms-1" size="lg" />
             <span className="ms-2 h5">Don Jerseys</span>
           </Link>
 
           <div className="ms-auto">
-            {/* Conditionally render Back Button */}
             {showBackButton && (
               <button type="button" className="btn btn-outline-secondary me-3" onClick={handleBackClick}>
                 <FontAwesomeIcon icon={['fas', 'arrow-left']} />
@@ -75,11 +76,10 @@ function ProductDetailsHeader() {
               </button>
             )}
 
-            {/* Shopping Cart */}
             <button
               type="button"
               className="btn btn-outline-dark"
-              onClick={toggleCart} // Open cart popup when clicked
+              onClick={toggleCart}
             >
               <FontAwesomeIcon icon={["fas", "shopping-cart"]} />
               <span className="ms-3 badge rounded-pill bg-dark">
@@ -90,7 +90,6 @@ function ProductDetailsHeader() {
         </div>
       </nav>
 
-      {/* Modal for Cart */}
       <Modal show={showCart} onHide={toggleCart}>
         <Modal.Header closeButton>
           <Modal.Title>Your Cart</Modal.Title>
@@ -116,7 +115,7 @@ function ProductDetailsHeader() {
                   </div>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={() => removeFromCart(item.id)} // Remove item from cart
+                    onClick={() => removeFromCart(item.id)}
                   >
                     Remove
                   </button>
@@ -128,7 +127,7 @@ function ProductDetailsHeader() {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <button className="btn btn-success" onClick={() => alert('Order placed!')}>
+          <button className="btn btn-success" onClick={handleOrderClick}>
             Order Now
           </button>
           <button className="btn btn-secondary" onClick={toggleCart}>

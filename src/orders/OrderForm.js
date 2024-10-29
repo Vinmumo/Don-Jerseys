@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import './OrderForm.css'; // Import the CSS file
 
 const OrderForm = ({ cart }) => {
   const [deliveryDetails, setDeliveryDetails] = useState({
@@ -30,49 +31,53 @@ const OrderForm = ({ cart }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Delivery Details</h2>
-      <div>
-        <label>Name:</label>
+    <form onSubmit={handleSubmit} className="form-container">
+      <h2 className="heading">Delivery Details</h2>
+      <div className="form-group">
+        <label className="label">Name:</label>
         <input
           type="text"
           name="name"
           value={deliveryDetails.name}
           onChange={handleInputChange}
           required
+          className="input"
         />
       </div>
-      <div>
-        <label>Email:</label>
+      <div className="form-group">
+        <label className="label">Email:</label>
         <input
           type="email"
           name="email"
           value={deliveryDetails.email}
           onChange={handleInputChange}
           required
+          className="input"
         />
       </div>
-      <div>
-        <label>Phone:</label>
+      <div className="form-group">
+        <label className="label">Phone:</label>
         <input
           type="text"
           name="phone"
           value={deliveryDetails.phone}
           onChange={handleInputChange}
           required
+          className="input"
         />
       </div>
-      <div>
-        <label>Delivery Location:</label>
+      <div className="form-group">
+        <label className="label">Delivery Location:</label>
         <input
           type="text"
           name="location"
           value={deliveryDetails.location}
           onChange={handleInputChange}
           required
+          className="input"
         />
       </div>
-      <button type="submit">Place Order</button>
+      <button type="submit" className="submit-button">Place Order</button>
     </form>
   );
 };
