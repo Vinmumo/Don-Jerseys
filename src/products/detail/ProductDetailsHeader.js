@@ -59,6 +59,9 @@ function ProductDetailsHeader() {
     navigate("/order-form"); // Navigate to the OrderForm page
   }
 
+  // Calculate total cart amount
+  const cartTotal = cart.reduce((total, item) => total + item.quantity * item.price, 0);
+
   return (
     <header>
       <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom">
@@ -127,6 +130,9 @@ function ProductDetailsHeader() {
           )}
         </Modal.Body>
         <Modal.Footer>
+          <div className="me-auto">
+            <h5>Total: ${cartTotal.toFixed(2)}</h5>
+          </div>
           <button className="btn btn-success" onClick={handleOrderClick}>
             Order Now
           </button>
