@@ -15,7 +15,10 @@ const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedImage, setSelectedImage] = useState(null); // New state for selected image
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [errorOrders, setErrorOrders] = useState('');
 
   const categoryImages = {
     "1": "",
@@ -30,13 +33,8 @@ const AdminDashboard = () => {
     }
   }, [navigate]);
 
-  const handleFormToggle = () => {
-    setShowForm(!showForm);
-  };
-
-  const handleAdminFormToggle = () => {
-    setShowAdminForm(!showAdminForm);
-  };
+  const handleFormToggle = () => setShowForm(!showForm);
+  const handleAdminFormToggle = () => setShowAdminForm(!showAdminForm);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -45,62 +43,56 @@ const AdminDashboard = () => {
     navigate('/');
   };
 
-  useEffect(() => {
-    fetch('http://127.0.0.1:5000/products/count-by-category')
-      .then((response) => response.json())
-      .then((data) => setCategoryCounts(data))
-      .catch((error) => console.error('Error fetching category counts:', error));
-  }, []);
-
-  const handleCategoryClick = (categoryId) => {
-    if (activeCategory === categoryId) {
-      setActiveCategory(null);
-      setProducts([]);
-    } else {
-      setActiveCategory(categoryId);
-      setLoading(true);
-      fetch(`http://127.0.0.1:5000/products/by-category/${categoryId}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setProducts(data);
-          setError('');
-        })
-        .catch((error) => {
-          console.error('Error fetching products:', error);
-          setError('Failed to load products. Please try again.');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  };
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImage(imageUrl);
-  };
-
-  const closeModal = () => {
-    setSelectedImage(null);
-  };
-
   const fetchCategories = async () => {
     try {
       const response = await fetch('http://127.0.0.1:5000/products/count-by-category');
       const data = await response.json();
       setCategoryCounts(data);
-      
     } catch (error) {
       console.error('Error fetching category counts:', error);
     }
   };
-  
+
   useEffect(() => {
     fetchCategories();
   }, []);
   
-  const handleCategoryAdded = () => {
-    fetchCategories();
+  const handleCategoryClick = (categoryId) => {
+    setActiveCategory(categoryId);
+    setLoading(true);
+    fetch(`http://127.0.0.1:5000/products/by-category/${categoryId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setProducts(data);
+        setError('');
+      })
+      .catch((error) => {
+        console.error('Error fetching products:', error);
+        setError('Failed to load products. Please try again.');
+      })
+      .finally(() => setLoading(false));
   };
+
+  const handleImageClick = (imageUrl) => setSelectedImage(imageUrl);
+  const closeModal = () => setSelectedImage(null);
+
+  const fetchOrders = async () => {
+    try {
+      setLoadingOrders(true);
+      const response = await axios.get('http://127.0.0.1:5000/getorders');
+      setOrders(response.data);
+      setErrorOrders('');
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      setErrorOrders('Failed to load orders. Please try again.');
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
   return (
     <div className="admin-dashboard">
@@ -114,7 +106,6 @@ const AdminDashboard = () => {
         <button className="toggle-form-btn" onClick={handleFormToggle}>
           {showForm ? 'Hide Form' : 'Add New Product'}
         </button>
-
         {showForm && (
           <div className="product-form-section">
             <MultiStepForm />
@@ -122,7 +113,7 @@ const AdminDashboard = () => {
         )}
 
         <div className="product-table-section">
-          <AddCategoryForm onCategoryAdded={handleCategoryAdded} />
+          <AddCategoryForm onCategoryAdded={fetchCategories} />
           <h3>Current Products by Category</h3>
           <div className="category-buttons">
             {categoryCounts.map((category) => (
@@ -183,14 +174,38 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        <button className="toggle-form-btn" onClick={handleAdminFormToggle}>
-          {showAdminForm ? 'Hide Admin Form' : 'Register New Admin'}
-        </button>
-
-        {showAdminForm && (
-          <div className="admin-form-section">
-            <RegisterAdminForm />
-          </div>
+        <h2>Orders</h2>
+        {loadingOrders ? (
+          <p>Loading orders...</p>
+        ) : errorOrders ? (
+          <p className="error-message">{errorOrders}</p>
+        ) : orders.length > 0 ? (
+          <table className="styled-table orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Location</th>
+                <th>Total Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.id}</td>
+                  <td>{order.name}</td>
+                  <td>{order.email}</td>
+                  <td>{order.phone}</td>
+                  <td>{order.location}</td>
+                  <td>{order.total_price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No orders found.</p>
         )}
 
         {selectedImage && (

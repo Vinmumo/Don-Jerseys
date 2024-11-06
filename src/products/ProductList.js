@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ScrollToTopOnMount from "../template/ScrollToTopOnMount";
-import Header from "../template/Header";
+import ProductDetailsHeader from "./detail/ProductDetailsHeader";
 import CartContext from "../CartContext"; // Import CartContext
 import "./Productlist.css";
 
@@ -92,7 +92,7 @@ function ProductList() {
 
   return (
     <>
-      <Header />
+      <ProductDetailsHeader/>
       <div className="container-full-width">
         <div className="main-content-container mt-5 py-4 px-xl-5">
           <ScrollToTopOnMount />

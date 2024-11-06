@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MultiStepForm.css';
 
 const MultiStepForm = () => {
@@ -15,6 +15,21 @@ const MultiStepForm = () => {
   const [imageFile, setImageFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // Fetch categories from the backend
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:5000/categories');
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,17 +79,9 @@ const MultiStepForm = () => {
   
         const imageUploadResult = await response.json();
   
-        // Log the entire response to confirm
-        console.log('Image upload response:', imageUploadResult);
-  
         if (response.ok && imageUploadResult.image_url) {
           const imageUrl = imageUploadResult.image_url;
-          console.log('Uploaded image URL:', imageUrl);
-  
-          // Update formData with the uploaded image URL
           const updatedFormData = { ...formData, imageUrl };
-  
-          // Submit product data with the updated imageUrl
           submitProductData(updatedFormData);
         } else {
           console.error('Failed to upload image or image_url missing:', imageUploadResult);
@@ -85,8 +92,6 @@ const MultiStepForm = () => {
     }
   };
   
-  
-
   const submitProductData = async (productData) => {
     try {
       const productResponse = await fetch('http://127.0.0.1:5000/products', {
@@ -133,6 +138,15 @@ const MultiStepForm = () => {
             onChange={handleChange}
           />
           {errors.description && <p className="error">{errors.description}</p>}
+            {/* Size input */}
+            <input
+              type="text"
+              name="size"
+              placeholder="Enter size (e.g., S, M, L, 42)"
+              value={formData.size}
+              onChange={handleChange}
+            />
+            {errors.size && <p className="error">{errors.size}</p>}
           <button onClick={nextStep}>Next</button>
         </div>
       )}
@@ -164,14 +178,20 @@ const MultiStepForm = () => {
       {step === 3 && (
         <div className="form-container">
           <h2>Step 3: Category and Image</h2>
-          <input
-            type="number"
+          <select
             name="category_id"
-            placeholder="Category id: 1-Jersey 2-Sportswear 3-Gym Equipment"
             value={formData.category_id}
             onChange={handleChange}
-          />
+          >
+            <option value="">Select Category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
           {errors.category_id && <p className="error">{errors.category_id}</p>}
+
           <input type="file" onChange={handleImageChange} />
           {errors.imageUrl && <p className="error">{errors.imageUrl}</p>}
           <button onClick={prevStep}>Back</button>
@@ -182,5 +202,4 @@ const MultiStepForm = () => {
   );
 };
 
-export default MultiStepForm; 
-
+export default MultiStepForm;

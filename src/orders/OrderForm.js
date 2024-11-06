@@ -1,14 +1,19 @@
 import { useState } from 'react';
-import axios from 'axios';
-import './OrderForm.css'; // Import the CSS file
+import { useLocation } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import './OrderForm.css';
 
-const OrderForm = ({ cart }) => {
+const OrderForm = () => {
+  const location = useLocation();
+  const cart = location.state?.cart || []; 
+
   const [deliveryDetails, setDeliveryDetails] = useState({
     name: '',
     email: '',
     phone: '',
     location: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -17,16 +22,43 @@ const OrderForm = ({ cart }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const response = await axios.post('/api/orders', {
-        cart,
-        delivery_details: deliveryDetails
+      const response = await fetch('http://127.0.0.1:5000/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          cart,
+          delivery_details: deliveryDetails
+        })
       });
-      console.log(response.data);
-      alert('Order placed successfully!');
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        Swal.fire({
+          icon: 'success',
+          title: 'Order placed!',
+          text: 'Your order will arrive in 1 business day. Payment is on delivery.',
+          confirmButtonText: 'OK',
+          timer: 9000
+        });
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Order placement failed.');
+      }
     } catch (error) {
       console.error(error);
-      alert('Order placement failed.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Order placement failed',
+        text: error.message,
+        confirmButtonText: 'OK'
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,9 +81,9 @@ const OrderForm = ({ cart }) => {
         <input
           type="email"
           name="email"
+          placeholder="(optional)"
           value={deliveryDetails.email}
           onChange={handleInputChange}
-          required
           className="input"
         />
       </div>
@@ -77,7 +109,9 @@ const OrderForm = ({ cart }) => {
           className="input"
         />
       </div>
-      <button type="submit" className="submit-button">Place Order</button>
+      <button type="submit" className="submit-button" disabled={isLoading}>
+        {isLoading ? 'Placing Order...' : 'Place Order'}
+      </button>
     </form>
   );
 };

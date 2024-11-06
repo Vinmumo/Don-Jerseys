@@ -5,19 +5,36 @@ import CartContext from '../../CartContext';
 import Modal from 'react-bootstrap/Modal';
 
 function ProductDetailsHeader() {
-  const { cart, removeFromCart, updateQuantity } = useContext(CartContext); 
+  const { cart, removeFromCart, updateQuantity, setCart } = useContext(CartContext); 
   const [showCart, setShowCart] = useState(false);
   const [user, setUser] = useState(null);
   const [showBackButton, setShowBackButton] = useState(false);
   const [previousPath, setPreviousPath] = useState(null);
+  const [openedDrawer, setOpenedDrawer] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
+  
 
   const location = useLocation(); 
   const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
+    const toggleDrawer = () => setOpenedDrawer(!openedDrawer);
+    const openLoginModal = () => { setIsSignup(false); setShowAuthModal(true); };
+    const openSignupModal = () => { setIsSignup(true); setShowAuthModal(true); };
+    const closeModal = () => setShowAuthModal(false);
+
+    const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+
     if (storedUser) {
       setUser(JSON.parse(storedUser));
+      console.log('User loaded from localStorage:', user);
     }
 
     if (location.pathname !== "/") {
@@ -30,10 +47,11 @@ function ProductDetailsHeader() {
     if (location.pathname !== previousLocation) {
       setPreviousPath(previousLocation);
     }
-  }, [location]);
+  }, [location, user]);
 
   function toggleCart() {
     setShowCart(!showCart);
+    console.log('Cart toggled. Current cart state:', showCart);
   }
 
   function handleQuantityChange(productId, newQuantity, stock) {
@@ -43,24 +61,53 @@ function ProductDetailsHeader() {
       alert('Quantity must be at least 1.');
     } else {
       updateQuantity(productId, newQuantity);
+      console.log(`Updated quantity for product ${productId} to ${newQuantity}`);
     }
   }
 
   function handleBackClick() {
     if (previousPath) {
       navigate(previousPath);
+      console.log(`Navigated back to ${previousPath}`);
     } else {
       navigate("/");
+      console.log("Navigated back to home.");
     }
   }
 
   function handleOrderClick() {
-    setShowCart(false); // Close the cart modal
-    navigate("/order-form"); // Navigate to the OrderForm page
+    // Check if all cart items have a size selected
+    const allSizesSelected = cart.every(item => item.size && item.size.trim() !== "");
+  
+    if (!allSizesSelected) {
+      alert("Please select a size for each item in the cart.");
+      console.error("Order attempt with missing sizes.");
+      return;
+    }
+  
+    if (cart.length === 0) {
+      alert("Cart is empty. Add items before proceeding.");
+      console.error("Order attempt with empty cart.");
+      return;
+    }
+    
+    setShowCart(false); 
+    navigate("/order-form", { state: { cart } }); 
+    console.log("Navigated to OrderForm with cart contents:", cart);
+  }
+  
+
+  function handleSizeChange(productId, newSize) {
+    setCart((prevCart) =>
+      prevCart.map(item =>
+        item.id === productId ? { ...item, size: newSize } : item
+      )
+    );
+    console.log(`Updated size for product ${productId} to ${newSize}`);
   }
 
-  // Calculate total cart amount
   const cartTotal = cart.reduce((total, item) => total + item.quantity * item.price, 0);
+  console.log('Current cart contents:', cart);
 
   return (
     <header>
@@ -115,6 +162,16 @@ function ProductDetailsHeader() {
                       />
                     </div>
                     <div>Price: ${item.price}</div>
+                    <div>
+                      Size:
+                      <input
+                        type="text"
+                        value={item.size || ''}
+                        placeholder="Enter size"
+                        required
+                        onChange={(e) => handleSizeChange(item.id, e.target.value)}
+                      />
+                    </div>
                   </div>
                   <button
                     className="btn btn-danger btn-sm"

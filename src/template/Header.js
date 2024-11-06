@@ -6,12 +6,13 @@ import AuthModal from '../user/AuthModal'; // Ensure the correct import path
 import Modal from 'react-bootstrap/Modal';
 
 function Header() {
-  const { cart, addToCart, updateQuantity, removeFromCart } = useContext(CartContext);
+  const { cart, removeFromCart, updateQuantity, setCart } = useContext(CartContext);
   const [openedDrawer, setOpenedDrawer] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
   const [user, setUser] = useState(null);
-  const [showCartModal, setShowCartModal] = useState(false); // For cart modal display
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [showCart, setShowCart] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -37,6 +38,11 @@ function Header() {
   const totalPrice = cart.reduce((acc, item) => acc + item.quantity * item.price, 0);
 
   const toggleCartModal = () => setShowCartModal(!showCartModal);
+  
+  function toggleCart() {
+    setShowCart(!showCart);
+    console.log('Cart toggled. Current cart state:', showCart);
+  }
 
   const handleQuantityChange = (productId, newQuantity, stock) => {
     if (newQuantity > stock) {
@@ -48,10 +54,37 @@ function Header() {
     }
   };
 
-  const handleOrderClick = () => {
-    toggleCartModal(); // Close the cart modal
-    navigate("/order-form"); // Navigate to the OrderForm page
-  };
+  function handleOrderClick() {
+    // Check if all cart items have a size selected
+    const allSizesSelected = cart.every(item => item.size && item.size.trim() !== "");
+  
+    if (!allSizesSelected) {
+      alert("Please select a size for each item in the cart.");
+      console.error("Order attempt with missing sizes.");
+      return;
+    }
+  
+    if (cart.length === 0) {
+      alert("Cart is empty. Add items before proceeding.");
+      console.error("Order attempt with empty cart.");
+      return;
+    }
+    
+    setShowCart(false); 
+    navigate("/order-form", { state: { cart } }); 
+    console.log("Navigated to OrderForm with cart contents:", cart);
+  }
+  
+  function handleSizeChange(productId, newSize) {
+    setCart((prevCart) =>
+      prevCart.map(item =>
+        item.id === productId ? { ...item, size: newSize } : item
+      )
+    );
+    console.log(`Updated size for product ${productId} to ${newSize}`);
+  }
+
+  const cartTotal = cart.reduce((total, item) => total + item.quantity * item.price, 0);
 
   return (
     <>
@@ -59,7 +92,7 @@ function Header() {
         <nav className="navbar fixed-top navbar-expand-lg navbar-light bg-white border-bottom">
           <div className="container-fluid">
             <Link className="navbar-brand" to="/" onClick={() => setOpenedDrawer(false)}>
-              <FontAwesomeIcon icon={['fab', 'bootstrap']} className="ms-1" size="lg" />
+              {/* <FontAwesomeIcon icon={['fab', 'bootstrap']} className="ms-1" size="lg" /> */}
               <span className="ms-2 h5">Don Jerseys</span>
             </Link>
             
@@ -146,59 +179,64 @@ function Header() {
 
         {/* Cart Modal */}
         <Modal show={showCartModal} onHide={toggleCartModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Your Cart</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {cart.length > 0 ? (
-              <ul className="list-group">
-                {cart.map((item) => (
-                  <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                      <div>{item.name}</div>
-                      <div>Price: {item.price} Ksh</div>
-                      <div className="input-group mt-1">
-                        <button
-                          className="btn btn-outline-secondary btn-sm"
-                          onClick={() => handleQuantityChange(item.id, item.quantity - 1, item.stock)}
-                          disabled={item.quantity === 1}
-                        >
-                          -
-                        </button>
-                        <span className="mx-2">{item.quantity}</span>
-                        <button
-                          className="btn btn-outline-secondary btn-sm"
-                          onClick={() => handleQuantityChange(item.id, item.quantity + 1, item.stock)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => removeFromCart(item.id)}
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>Your cart is empty.</p>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <div className="me-auto">
-              <h5>Total: {totalPrice.toFixed(2)} Ksh</h5>
+  <Modal.Header closeButton>
+    <Modal.Title>Your Cart</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {cart.length > 0 ? (
+      <ul className="list-group">
+        {cart.map((item, index) => (
+          <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <div>{item.name}</div>
+              <div>
+                Quantity: 
+                <input 
+                  type="number" 
+                  value={item.quantity} 
+                  min="1" 
+                  max={item.stock} 
+                  onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value), item.stock)} 
+                />
+              </div>
+              <div>Price: ${item.price}</div>
+              <div>
+                Size:
+                <input
+                  type="text"
+                  value={item.size || ''}
+                  placeholder="Enter size"
+                  required
+                  onChange={(e) => handleSizeChange(item.id, e.target.value)}
+                />
+              </div>
             </div>
-            <button className="btn btn-success" onClick={handleOrderClick}>
-              Order Now
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={() => removeFromCart(item.id)}
+            >
+              Remove
             </button>
-            <button className="btn btn-secondary" onClick={toggleCartModal}>
-              Close
-            </button>
-          </Modal.Footer>
-        </Modal>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>Your cart is empty.</p>
+    )}
+  </Modal.Body>
+  <Modal.Footer>
+    <div className="me-auto">
+      <h5>Total: ${cartTotal.toFixed(2)}</h5>
+    </div>
+    <button className="btn btn-success" onClick={handleOrderClick}>
+      Order Now
+    </button>
+    <button className="btn btn-secondary" onClick={toggleCartModal}>
+      Close
+    </button>
+  </Modal.Footer>
+</Modal>
+
 
       </header>
 
