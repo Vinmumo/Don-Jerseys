@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import './RelatedProduct.css'; 
 
 function RelatedProduct({ category_id, currentProductId }) {
-  const [relatedJerseys, setRelatedJerseys] = useState([]);
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
     console.log("Fetching related products for category:", category_id);
@@ -18,47 +18,47 @@ function RelatedProduct({ category_id, currentProductId }) {
       })
       .then(data => {
         // Filter out the current product
-        const filteredProducts = data.filter(jersey => jersey.id !== currentProductId);
+        const filteredProducts = data.filter(product => product.id !== currentProductId);
   
         // Ensure there are no duplicate types (home, away, third)
-        const uniqueJerseys = [];
+        const uniqueProducts = [];
         const seenTypes = new Set();
   
-        filteredProducts.forEach(jersey => {
-          const jerseyType = jersey.name.split(" ")[1];  // Assuming type is in the name, e.g., "Arsenal Home Kit"
-          if (!seenTypes.has(jerseyType)) {
-            uniqueJerseys.push(jersey);
-            seenTypes.add(jerseyType);
+        filteredProducts.forEach(product => {
+          const productType = product.name.split(" ")[1];  // Assuming type is in the name
+          if (!seenTypes.has(productType)) {
+            uniqueProducts.push(product);
+            seenTypes.add(productType);
           }
         });
   
-        setRelatedJerseys(uniqueJerseys);
+        setRelatedProducts(uniqueProducts);
       })
       .catch(error => {
-        console.error('Error fetching products:', error);
+        console.error('Error fetching related products:', error);
       });
-  }, [currentProductId, category_id]);  // Use category_id for filtering
+  }, [currentProductId, category_id]);  // Run effect when currentProductId or category_id changes
 
   return (
     <>
-      {relatedJerseys.length > 0 ? (
-        relatedJerseys.map((jersey) => (
-          <div className="col" key={jersey.id}>
+      {relatedProducts.length > 0 ? (
+        relatedProducts.map((product) => (
+          <div className="col" key={product.id}>
             <div className="card shadow-sm">
               <img
                 className="card-img-top cover"
-                alt={jersey.name}
-                src={jersey.image_url}
+                alt={product.name}
+                src={product.image_url}
               />
               <div className="card-body">
-                <h5 className="card-title text-center">{jersey.name}</h5>
-                <h6 className="card-text text-center">{jersey.description}</h6>
+                <h5 className="card-title text-center">{product.name}</h5>
+                <h6 className="card-text text-center">{product.description}</h6>
                 <p className="card-text text-center text-muted">
-                  {jersey.price} Ksh
+                  {product.price} Ksh
                 </p>
                 <div className="d-grid gap-2">
                   <Link
-                    to={`/products/${jersey.id}`}
+                    to={`/products/${product.id}`}
                     className="btn btn-outline-dark"
                   >
                     Details

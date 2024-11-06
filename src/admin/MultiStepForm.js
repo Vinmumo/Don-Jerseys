@@ -8,6 +8,7 @@ const MultiStepForm = () => {
     description: '',
     price: '',
     category_id: '',
+    size: '',
     stock: '',
     imageUrl: ''
   });
@@ -181,4 +182,5 @@ const MultiStepForm = () => {
   );
 };
 
-export default MultiStepForm;
+export default MultiStepForm; 
+

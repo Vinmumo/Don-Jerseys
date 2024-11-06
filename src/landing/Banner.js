@@ -18,7 +18,7 @@ function BannerImage(props) {
   return (
     <div
       className={"carousel-item " + (props.active ? "active" : "")}
-      data-bs-interval="5000"
+      data-bs-interval="1000"
     >
       <div
         className="ratio"

@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ScrollToTopOnMount from "../template/ScrollToTopOnMount";
 import Header from "../template/Header";
-import "./Productlist.css"
+import CartContext from "../CartContext"; // Import CartContext
+import "./Productlist.css";
 
 function FilterMenuLeft({ categories, selectedCategory, setSelectedCategory }) {
   return (
@@ -19,7 +20,7 @@ function FilterMenuLeft({ categories, selectedCategory, setSelectedCategory }) {
               }`}
               onClick={() => setSelectedCategory(category)}
             >
-              {category} {/* Use category directly here as it should now be a string */}
+              {category}
             </button>
           ))}
         </div>
@@ -32,11 +33,11 @@ function ProductList() {
   const [viewType, setViewType] = useState({ grid: true });
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories, setCategories] = useState(["All Products"]); // Start with default "All Products"
+  const [categories, setCategories] = useState(["All Products"]);
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchTerm, setSearchTerm] = useState("");
+  const { addToCart } = useContext(CartContext); // Access addToCart function from CartContext
 
-  // Fetch categories from the backend
   useEffect(() => {
     fetch("http://127.0.0.1:5000/categories")
       .then((response) => response.json())
@@ -46,18 +47,16 @@ function ProductList() {
       .catch((error) => console.error("Error fetching categories:", error));
   }, []);
 
-  // Fetch products 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/products") 
+    fetch("http://127.0.0.1:5000/products")
       .then((response) => response.json())
       .then((data) => {
         setProducts(data);
-        setFilteredProducts(data); // Set filtered products initially to all products
+        setFilteredProducts(data);
       })
       .catch((error) => console.error("Error fetching products:", error));
   }, []);
 
-  // Filter products based on the selected category
   useEffect(() => {
     if (selectedCategory === "All Products") {
       setFilteredProducts(products);
@@ -69,7 +68,6 @@ function ProductList() {
     }
   }, [selectedCategory, products]);
 
-  // Filter products based on the search term
   useEffect(() => {
     if (searchTerm) {
       const filtered = products.filter((product) =>
@@ -98,7 +96,7 @@ function ProductList() {
       <div className="container-full-width">
         <div className="main-content-container mt-5 py-4 px-xl-5">
           <ScrollToTopOnMount />
-  
+
           {/* Filter Menu for Categories */}
           <div className="row mb-4 mt-lg-3">
             <div className="col-lg-3 d-none d-lg-block">
@@ -110,7 +108,7 @@ function ProductList() {
                 />
               </div>
             </div>
-  
+
             {/* Main Product Listing */}
             <div className="col-lg-9">
               <div className="d-flex flex-column h-100">
@@ -140,7 +138,7 @@ function ProductList() {
                     </button>
                   </div>
                 </div>
-  
+
                 {/* Product Cards */}
                 <div
                   className={
@@ -165,6 +163,12 @@ function ProductList() {
                               {product.price} Ks
                             </p>
                             <div className="d-grid gap-2">
+                              <button
+                                className="btn btn-dark"
+                                onClick={() => addToCart(product)} // Add product to cart
+                              >
+                                Add to Cart
+                              </button>
                               <Link
                                 to={`/products/${product.id}`}
                                 state={{
