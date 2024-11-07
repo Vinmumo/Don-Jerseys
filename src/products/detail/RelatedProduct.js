@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import './RelatedProduct.css'; 
+import { FaEye } from 'react-icons/fa';  // Import the view details icon
+import './RelatedProduct.css';
 
 function RelatedProduct({ category_id, currentProductId }) {
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -37,31 +38,46 @@ function RelatedProduct({ category_id, currentProductId }) {
       .catch(error => {
         console.error('Error fetching related products:', error);
       });
-  }, [currentProductId, category_id]);  // Run effect when currentProductId or category_id changes
+  }, [currentProductId, category_id]);
 
   return (
     <>
       {relatedProducts.length > 0 ? (
         relatedProducts.map((product) => (
           <div className="col" key={product.id}>
-            <div className="card shadow-sm">
-              <img
-                className="card-img-top cover"
-                alt={product.name}
-                src={product.image_url}
-              />
-              <div className="card-body">
-                <h5 className="card-title text-center">{product.name}</h5>
-                <h6 className="card-text text-center">{product.description}</h6>
-                <p className="card-text text-center text-muted">
-                  {product.price} Ksh
-                </p>
-                <div className="d-grid gap-2">
+            <div className="card product-card shadow-sm hover-effect">
+              <Link to={`/products/${product.id}`} state={{ 
+                id: product.id,
+                name: product.name,
+                image: product.image_url,
+                price: product.price,
+                description: product.description,
+                team: product.team 
+              }}>
+                <img
+                  className="card-img-top cover"
+                  alt={product.name}
+                  src={product.image_url}
+                />
+              </Link>
+              <div className="card-body text-center">
+                <h5 className="product-name">{product.name}</h5>
+                <div className="price-details-container">
+                  <p className="product-price">{product.price} Ksh</p>
                   <Link
                     to={`/products/${product.id}`}
-                    className="btn btn-outline-dark"
+                    state={{
+                      id: product.id,
+                      name: product.name,
+                      image: product.image_url,
+                      price: product.price,
+                      description: product.description,
+                      team: product.team,
+                    }}
+                    className="view-details-link"
+                    replace
                   >
-                    Details
+                    <FaEye className="view-details-icon" /> View Details
                   </Link>
                 </div>
               </div>

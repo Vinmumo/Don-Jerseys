@@ -1,18 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from "react-router-dom";
 import './FeatureProduct.css';
-import CartContext from '../CartContext'; // Import CartContext
+import { FaEye } from 'react-icons/fa';
 
 function FeatureProduct({ product, image, name, price, id }) {
-  const { addToCart } = useContext(CartContext); // Access addToCart from context
-
-  const handleAddToCart = () => {
-    addToCart(product, 1); // Call addToCart with the current product and a default quantity of 1
-  };
-
   return (
     <div className="col">
-      <div className="card shadow-sm hover-effect">
+      <div className="card product-card shadow-sm hover-effect">
         <Link to={`/products/${id}`} state={{ 
           id: product.id,
           name: product.name,
@@ -22,15 +16,15 @@ function FeatureProduct({ product, image, name, price, id }) {
           team: product.team 
         }}>
           <img
-            className="card-img-top cover"
+            className="card-img-top product-image"
             alt={name}
             src={image}
           />
         </Link>
-        <div className="card-body">
-          <h5 className="card-title text-center">{name}</h5>
-          <p className="card-text text-center text-muted">{price} Ks</p>
-          <div className="d-grid gap-2">
+        <div className="card-body text-center">
+          <h5 className="product-name">{name}</h5>
+          <div className="price-details-container">
+            <p className="product-price">KES {price.toFixed(2)}</p>
             <Link
               to={`/products/${id}`}
               state={{ 
@@ -41,17 +35,11 @@ function FeatureProduct({ product, image, name, price, id }) {
                 description: product.description,
                 team: product.team 
               }}
-              className="btn btn-outline-dark"
+              className="view-details-link"
               replace
             >
-              Details
+              <FaEye className="view-details-icon" /> View Details
             </Link>
-            <button
-              onClick={handleAddToCart}
-              className="btn btn-primary mt-2"
-            >
-              Add to Cart
-            </button>
           </div>
         </div>
       </div>

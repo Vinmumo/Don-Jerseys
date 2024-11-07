@@ -1,10 +1,11 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaEye } from 'react-icons/fa';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Correctly import FontAwesomeIcon
+import { faSearch } from '@fortawesome/free-solid-svg-icons'; // Import the search icon
 import ScrollToTopOnMount from "../template/ScrollToTopOnMount";
 import ProductDetailsHeader from "./detail/ProductDetailsHeader";
-import CartContext from "../CartContext"; // Import CartContext
-import "./Productlist.css";
+import './Productlist.css';
 
 function FilterMenuLeft({ categories, selectedCategory, setSelectedCategory }) {
   return (
@@ -36,7 +37,6 @@ function ProductList() {
   const [categories, setCategories] = useState(["All Products"]);
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [searchTerm, setSearchTerm] = useState("");
-  const { addToCart } = useContext(CartContext); // Access addToCart function from CartContext
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/categories")
@@ -92,7 +92,7 @@ function ProductList() {
 
   return (
     <>
-      <ProductDetailsHeader/>
+      <ProductDetailsHeader />
       <div className="container-full-width">
         <div className="main-content-container mt-5 py-4 px-xl-5">
           <ScrollToTopOnMount />
@@ -125,7 +125,7 @@ function ProductList() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                       <button className="btn btn-outline-dark">
-                        <FontAwesomeIcon icon={["fas", "search"]} />
+                        <FontAwesomeIcon icon={faSearch} /> {/* Corrected search icon */}
                       </button>
                     </div>
                     <button
@@ -133,7 +133,7 @@ function ProductList() {
                       onClick={changeViewType}
                     >
                       <FontAwesomeIcon
-                        icon={["fas", viewType.grid ? "th-list" : "th-large"]}
+                        icon={viewType.grid ? "th-list" : "th-large"} // Switch icon depending on the view type
                       />
                     </button>
                   </div>
@@ -149,26 +149,25 @@ function ProductList() {
                   {filteredProducts.length > 0 ? (
                     filteredProducts.map((product) => (
                       <div key={product.id} className="col">
-                        <div className="card shadow-sm">
-                          <img
-                            className="card-img-top cover"
-                            alt={product.name}
-                            src={product.image_url}
-                          />
-                          <div className="card-body">
-                            <h5 className="card-title text-center">
-                              {product.name}
-                            </h5>
-                            <p className="card-text text-center text-muted">
-                              {product.price} Ks
-                            </p>
-                            <div className="d-grid gap-2">
-                              <button
-                                className="btn btn-dark"
-                                onClick={() => addToCart(product)} // Add product to cart
-                              >
-                                Add to Cart
-                              </button>
+                        <div className="card product-card shadow-sm hover-effect">
+                          <Link to={`/products/${product.id}`} state={{ 
+                            id: product.id,
+                            name: product.name,
+                            image: product.image_url,
+                            price: product.price,
+                            description: product.description,
+                            team: product.team 
+                          }}>
+                            <img
+                              className="card-img-top product-image"
+                              alt={product.name}
+                              src={product.image_url}
+                            />
+                          </Link>
+                          <div className="card-body text-center">
+                            <h5 className="product-name">{product.name}</h5>
+                            <div className="price-details-container">
+                              <p className="product-price">{product.price} Ks</p>
                               <Link
                                 to={`/products/${product.id}`}
                                 state={{
@@ -179,10 +178,10 @@ function ProductList() {
                                   description: product.description,
                                   team: product.team,
                                 }}
-                                className="btn btn-outline-dark"
+                                className="view-details-link"
                                 replace
                               >
-                                Details
+                                <FaEye className="view-details-icon" /> View Details
                               </Link>
                             </div>
                           </div>
