@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import './OrderForm.css';
+import ProductDetailsHeader from '../products/detail/ProductDetailsHeader';
 
 const OrderForm = () => {
   const location = useLocation();
   const cart = location.state?.cart || []; 
+  const cartTotal = location.state?.cartTotal || 0;
 
   const [deliveryDetails, setDeliveryDetails] = useState({
     name: '',
@@ -31,7 +33,8 @@ const OrderForm = () => {
         },
         body: JSON.stringify({
           cart,
-          delivery_details: deliveryDetails
+          delivery_details: deliveryDetails,
+          total_price: cartTotal,
         })
       });
 
@@ -63,6 +66,9 @@ const OrderForm = () => {
   };
 
   return (
+    <>
+    <div style={{ backgroundColor: '#ffecd1', minHeight: '100vh' }}>
+    <ProductDetailsHeader />
     <form onSubmit={handleSubmit} className="form-container">
       <h2 className="heading">Delivery Details</h2>
       <div className="form-group">
@@ -113,6 +119,8 @@ const OrderForm = () => {
         {isLoading ? 'Placing Order...' : 'Place Order'}
       </button>
     </form>
+    </div>
+    </>
   );
 };
 

@@ -1,17 +1,23 @@
 /* OrderForm.css */
+body{
+  background-color: #ffecd1;
+  margin: 0;
+  padding: 0;
+}
 .form-container {
     max-width: 500px;
-    margin: 0 auto;
+    margin: 5px auto;
     padding: 20px;
     border-radius: 8px;
     background-color: #f8f9fa;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 60px;
   }
   
   .heading {
     text-align: center;
     margin-bottom: 20px;
-    color: #ff6600;
+    color: #3a972e;
   }
   
   .form-group {
@@ -38,7 +44,7 @@
     padding: 12px;
     border-radius: 4px;
     border: none;
-    background-color: #ff6600;
+    background-color: #3a972e;
     color: #fff;
     font-size: 16px;
     font-weight: bold;

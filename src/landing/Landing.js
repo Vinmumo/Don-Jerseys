@@ -32,7 +32,7 @@ function Landing() {
       <Banner />
 
       <div className="d-flex flex-column bg-orange py-4">
-        <p className="text-center px-5">We are Located at Nairobi CBD.</p>
+        <p className="text-center px-5 text-danger">We are Located at Nairobi CBD.</p>
         <div className="d-flex justify-content-center">
           <Link to="/products" className="btn btn-primary" replace>
             Browse products

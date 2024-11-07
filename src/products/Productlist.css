@@ -144,6 +144,8 @@
 .product-card {
   border: none;
   transition: transform 0.3s;
+  max-width: 350px;
+  max-height: 450px;
 }
 
 .product-card:hover {

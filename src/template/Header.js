@@ -39,9 +39,8 @@ function Header() {
 
   const toggleCartModal = () => setShowCartModal(!showCartModal);
   
-  function toggleCart() {
-    setShowCart(!showCart);
-    console.log('Cart toggled. Current cart state:', showCart);
+  function navigateToCart() {
+    navigate("/cart");
   }
 
   const handleQuantityChange = (productId, newQuantity, stock) => {
@@ -112,7 +111,7 @@ function Header() {
                   <button
                     type="button"
                     className="btn btn-outline-dark position-relative"
-                    onClick={toggleCartModal}
+                    onClick={navigateToCart}
                   >
                     <FontAwesomeIcon icon={['fas', 'shopping-cart']} />
                     {totalItems > 0 && (
@@ -178,7 +177,7 @@ function Header() {
         </nav>
 
         {/* Cart Modal */}
-        <Modal show={showCartModal} onHide={toggleCartModal}>
+        {/* <Modal show={showCartModal} onHide={toggleCartModal}>
   <Modal.Header closeButton>
     <Modal.Title>Your Cart</Modal.Title>
   </Modal.Header>
@@ -235,7 +234,7 @@ function Header() {
       Close
     </button>
   </Modal.Footer>
-</Modal>
+</Modal> */}
 
 
       </header>

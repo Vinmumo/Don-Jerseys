@@ -10,6 +10,7 @@ import LoginPage from './admin/LoginPage';
 import ProductDetailsHeader from './products/detail/ProductDetailsHeader';
 import OrderForm from './orders/OrderForm'; 
 import { CartProvider } from './CartContext'; 
+import Cart from './orders/Cart';
 
 function App() {
   return (
@@ -49,7 +50,7 @@ function App() {
             <>
               <ProductDetailsHeader />
               <ProductDetail />
-              <Footer />
+              {/* <Footer /> */}
             </>
           } 
         />
@@ -61,6 +62,7 @@ function App() {
           path="*" 
           element={<h1>An Error occurred</h1>} 
         />
+         <Route path="/cart" element={<Cart />} />
       </Routes>
     </CartProvider>
   );

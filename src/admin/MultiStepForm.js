@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import './MultiStepForm.css';
 
 const MultiStepForm = () => {
@@ -8,17 +9,15 @@ const MultiStepForm = () => {
     description: '',
     price: '',
     category_id: '',
-    size: '',
+    sizes: '', // stores sizes as comma-separated string
     stock: '',
     imageUrl: ''
   });
   const [imageFile, setImageFile] = useState(null);
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState('');
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    // Fetch categories from the backend
     const fetchCategories = async () => {
       try {
         const response = await fetch('http://127.0.0.1:5000/categories');
@@ -47,6 +46,7 @@ const MultiStepForm = () => {
     if (step === 1) {
       if (!formData.name) newErrors.name = 'Product name is required';
       if (!formData.description) newErrors.description = 'Product description is required';
+      if (!formData.sizes) newErrors.sizes = 'Size(s) are required';
     } else if (step === 2) {
       if (!formData.price || formData.price <= 0) newErrors.price = 'Price must be a positive number';
       if (!formData.stock || formData.stock < 0) newErrors.stock = 'Stock cannot be negative';
@@ -81,7 +81,14 @@ const MultiStepForm = () => {
   
         if (response.ok && imageUploadResult.image_url) {
           const imageUrl = imageUploadResult.image_url;
-          const updatedFormData = { ...formData, imageUrl };
+  
+          // Convert sizes from string to array (split by commas and trim spaces)
+          const sizesArray = formData.sizes.split(',').map(size => size.trim());
+  
+          // Update formData with the imageUrl and sizesArray
+          const updatedFormData = { ...formData, imageUrl, sizes: sizesArray };
+  
+          // Submit the updated product data
           submitProductData(updatedFormData);
         } else {
           console.error('Failed to upload image or image_url missing:', imageUploadResult);
@@ -91,7 +98,7 @@ const MultiStepForm = () => {
       }
     }
   };
-  
+
   const submitProductData = async (productData) => {
     try {
       const productResponse = await fetch('http://127.0.0.1:5000/products', {
@@ -103,22 +110,40 @@ const MultiStepForm = () => {
       });
 
       if (productResponse.ok) {
-        setSuccessMessage('Product added successfully!');
-        setTimeout(() => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Product Added Successfully!',
+          text: 'The product has been added to the catalog.',
+          showConfirmButton: true,
+          confirmButtonText: 'OK'
+        }).then(() => {
           window.location.reload();
-        }, 3000);
+        });
       } else {
-        console.error('Error submitting product data:', await productResponse.json());
+        const errorData = await productResponse.json();
+        console.error('Error submitting product data:', errorData);
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to Add Product',
+          text: 'Please check the entered details and try again.',
+          showConfirmButton: true,
+          confirmButtonText: 'OK'
+        });
       }
     } catch (error) {
       console.error('Error submitting product data:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Error',
+        text: 'An error occurred while submitting the product. Please try again later.',
+        showConfirmButton: true,
+        confirmButtonText: 'OK'
+      });
     }
   };
 
   return (
     <>
-      {successMessage && <div className="success-popup">{successMessage}</div>}
-      
       {step === 1 && (
         <div className="form-container">
           <h2>Step 1: Product Details</h2>
@@ -138,15 +163,14 @@ const MultiStepForm = () => {
             onChange={handleChange}
           />
           {errors.description && <p className="error">{errors.description}</p>}
-            {/* Size input */}
-            <input
-              type="text"
-              name="size"
-              placeholder="Enter size (e.g., S, M, L, 42)"
-              value={formData.size}
-              onChange={handleChange}
-            />
-            {errors.size && <p className="error">{errors.size}</p>}
+          <input
+            type="text"
+            name="sizes"
+            placeholder="Enter size (e.g., S, M, L, 42)"
+            value={formData.sizes}
+            onChange={handleChange}
+          />
+          {errors.sizes && <p className="error">{errors.sizes}</p>}
           <button onClick={nextStep}>Next</button>
         </div>
       )}

@@ -20,38 +20,26 @@ function ProductDetailsHeader() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    const toggleDrawer = () => setOpenedDrawer(!openedDrawer);
-    const openLoginModal = () => { setIsSignup(false); setShowAuthModal(true); };
-    const openSignupModal = () => { setIsSignup(true); setShowAuthModal(true); };
-    const closeModal = () => setShowAuthModal(false);
-
-    const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
-
-
-    if (storedUser) {
+    
+    if (storedUser && !user) { 
       setUser(JSON.parse(storedUser));
-      console.log('User loaded from localStorage:', user);
     }
-
+  
     if (location.pathname !== "/") {
       setShowBackButton(true);
     } else {
       setShowBackButton(false);
     }
-
+  
     const previousLocation = location.state?.from || "/";
     if (location.pathname !== previousLocation) {
       setPreviousPath(previousLocation);
     }
-  }, [location, user]);
+  }, [location]);
 
-  function toggleCart() {
-    setShowCart(!showCart);
-    console.log('Cart toggled. Current cart state:', showCart);
+
+  function navigateToCart() {
+    navigate("/cart");
   }
 
   function handleQuantityChange(productId, newQuantity, stock) {
@@ -61,7 +49,7 @@ function ProductDetailsHeader() {
       alert('Quantity must be at least 1.');
     } else {
       updateQuantity(productId, newQuantity);
-      console.log(`Updated quantity for product ${productId} to ${newQuantity}`);
+      // console.log(`Updated quantity for product ${productId} to ${newQuantity}`);
     }
   }
 
@@ -107,7 +95,7 @@ function ProductDetailsHeader() {
   }
 
   const cartTotal = cart.reduce((total, item) => total + item.quantity * item.price, 0);
-  console.log('Current cart contents:', cart);
+  // console.log('Current cart contents:', cart);
 
   return (
     <header>
@@ -129,7 +117,7 @@ function ProductDetailsHeader() {
             <button
               type="button"
               className="btn btn-outline-dark"
-              onClick={toggleCart}
+              onClick={navigateToCart}
             >
               <FontAwesomeIcon icon={["fas", "shopping-cart"]} />
               <span className="ms-3 badge rounded-pill bg-dark">
@@ -140,7 +128,7 @@ function ProductDetailsHeader() {
         </div>
       </nav>
 
-      <Modal show={showCart} onHide={toggleCart}>
+      {/* <Modal show={showCart} onHide={toggleCart}>
         <Modal.Header closeButton>
           <Modal.Title>Your Cart</Modal.Title>
         </Modal.Header>
@@ -197,7 +185,7 @@ function ProductDetailsHeader() {
             Close
           </button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </header>
   );
 }

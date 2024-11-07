@@ -1,6 +1,6 @@
 /* General Styling */
 .bg-orange {
-  background-color: #FFA500; /* Example orange shade */
+  background-color: #ffecd1; /* Example orange shade */
   color: #fff;
 }
 
@@ -112,12 +112,12 @@
 /* New Arrival Section */
 .new-arrival-heading {
   font-weight: bold;
-  color: #dd4b16;
+  color: #ffecd1;
 }
 
 /* Remove margin from h2 and add padding */
 .new-arrival-title {
-  background-color: #FFA500; /* Match background color */
+  background-color: #ffecd1; /* Match background color */
   padding: 1rem 0;
   margin: 0; /* Remove default margin */
 }
