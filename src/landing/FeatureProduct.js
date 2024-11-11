@@ -7,6 +7,7 @@ function FeatureProduct({ product, image, name, price, id }) {
   return (
     <div className="col">
       <div className="card product-card shadow-sm hover-effect">
+        {/* Fixed backticks around the Link URL */}
         <Link to={`/products/${id}`} state={{ 
           id: product.id,
           name: product.name,
@@ -25,6 +26,7 @@ function FeatureProduct({ product, image, name, price, id }) {
           <h5 className="product-name">{name}</h5>
           <div className="price-details-container">
             <p className="product-price">KES {price.toFixed(2)}</p>
+            {/* Fixed backticks around the Link URL */}
             <Link
               to={`/products/${id}`}
               state={{ 

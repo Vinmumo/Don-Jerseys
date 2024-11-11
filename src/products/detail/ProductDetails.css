@@ -1,14 +1,13 @@
-/* ProductDetails.css */
-
 .product-details-container {
   padding: 20px;
   background-color: #ffecd1;
 }
 
-.producct-name {
+.product-name {
   font-size: 23px;
   font-weight: bold;
   margin-bottom: 15px;
+  color: #333333; /* Almost black */
 }
 
 .selection-options h5,
@@ -17,7 +16,7 @@
 .custom-options h5 {
   font-size: 18px;
   margin-bottom: 10px;
-  color: #333;
+  color: #333333; /* Almost black */
 }
 
 .selection-options button,
@@ -27,19 +26,19 @@
   padding: 10px 20px;
   cursor: pointer;
   background-color: #fff;
-  color: #333;
+  color: #333333; /* Almost black */
 }
 
 .selection-options button.selected,
 .size-options button.selected {
-  border: 2px solid #d9534f;
-  background-color: #ffe6e6;
-  color: #d9534f;
+  border: 2px solid #007bff; /* Medium blue */
+  background-color: #e6f2ff; /* Light blue background */
+  color: #007bff; /* Medium blue */
 }
 
 .selection-options button:hover,
 .size-options button:hover {
-  border-color: #d9534f;
+  border-color: #007bff; /* Medium blue */
 }
 
 /* Badge, Font Type, and Custom Options styling */
@@ -51,7 +50,7 @@
   gap: 5px;
   font-weight: normal;
   margin-bottom: 10px;
-  color: #333;
+  color: #333333; /* Almost black */
 }
 
 .badge-options input[type="radio"],
@@ -74,11 +73,11 @@
 .product-price {
   margin-top: 20px;
   font-size: 24px;
-  color: #d9534f;
+  color: #007bff; /* Medium blue */
 }
 
 .product-price .discounted-price {
-  color: #d9534f;
+  color: #007bff; /* Medium blue */
   font-weight: bold;
   font-size: 24px;
 }
@@ -86,7 +85,7 @@
 .product-price .original-price {
   text-decoration: line-through;
   margin-left: 10px;
-  color: #777;
+  color: #777777; /* Dark gray */
 }
 
 .product-price .savings {
@@ -94,41 +93,62 @@
   margin-left: 10px;
 }
 
-/* Add to Cart Button */
-.btn-dark {
-  background-color: #333;
-  color: #fff;
+.quantity-and-cart {
+  display: flex;
+  align-items: center;
+}
+
+.quantity-controls button {
+  font-size: 24px;
+  padding: 5px 15px;
   border: none;
-  padding: 10px;
-}
-
-.btn-dark:disabled {
-  background-color: #ccc;
-  color: #666;
-  cursor: not-allowed;
-}
-
-.btn-dark:hover:enabled {
-  background-color: #555;
-}
-
-/* Product Image */
-.product-image img {
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.sold-out-badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: #d9534f;
+  background-color: #007bff; /* Medium blue */
   color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-weight: bold;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
 }
+
+.quantity-controls input {
+  width: 50px;
+  text-align: center;
+  font-size: 18px;
+  margin: 0 10px;
+}
+
+.add-to-cart-button {
+  background-color: #20c997; /* Light teal background */
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.add-to-cart-button:hover {
+  background-color: #17a589;
+}
+
+.add-to-cart-button i {
+  font-size: 18px;
+}
+.btn-primary, .btn-dark {
+  padding: 6px 10px; /* Reduces padding further */
+  font-size: 0.85rem; /* Slightly smaller font size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px; /* Space between icon and text */
+}
+
+.btn-primary .fa-shopping-cart,
+.btn-dark .fa-shopping-cart {
+  margin-right: 5px; /* Adjust icon spacing */
+}
+
 
 /* Related Products Section */
 .related-products-section {
@@ -137,7 +157,7 @@
 
 .related-products-section h3 {
   font-size: 22px;
-  color: #333;
+  color: #333333; /* Almost black */
 }
 
 .product-list {
@@ -160,38 +180,30 @@
   border-radius: 8px;
 }
 
-/* Quantity Control */
-.quantity-control {
-  display: flex;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.quantity-control button {
-  font-size: 18px;
-  padding: 5px 15px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  cursor: pointer;
-}
-
-.quantity-control input {
-  width: 50px;
-  text-align: center;
-  margin: 0 5px;
-  border: 1px solid #ddd;
-  padding: 5px;
-  border-radius: 4px;
-}
-
 /* Hover effects */
 .btn-edition:hover,
 .btn-size:hover {
-  border-color: #d9534f;
+  border-color: #007bff; /* Medium blue */
 }
 
 .related-products-section .product-card:hover {
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-5px);
   transition: all 0.3s ease;
+}
+
+.warning-text {
+  color: red;
+}
+
+.warning-border {
+  border: 2px solid red;
+}
+
+.required-label {
+  color: #333333; /* Almost black */
+}
+
+.required-label.warning-text {
+  color: red;
 }

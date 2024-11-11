@@ -2,11 +2,31 @@ import React, { useContext } from 'react';
 import CartContext from '../CartContext';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './Cart.css';
 import ProductDetailsHeader from '../products/detail/ProductDetailsHeader';
 
 function Cart() {
-  const { cart, removeFromCart } = useContext(CartContext);
+  const { cart, removeFromCart, updateQuantity } = useContext(CartContext);
   const navigate = useNavigate();
+
+  // Function to calculate the customization charge
+  const calculateCustomizationCharge = (item) => {
+    let customizationCharge = 0;
+
+    // Add charge for Name, Number, Font Type, and Badge
+    if (item.customName) customizationCharge += 200;  // 200 for Name
+    if (item.customNumber) customizationCharge += 200;  // 200 for Number
+    if (item.fontType) customizationCharge += 100;  // 100 for Font Type
+    if (item.badge) customizationCharge += 100;  // 100 for Badge
+
+    return customizationCharge;
+  };
+
+  // Calculate total including dynamic customization charges
+  const cartTotal = cart.reduce((total, item) => {
+    const customizationCharge = calculateCustomizationCharge(item);
+    return total + item.quantity * (item.price + customizationCharge);  // Add customization charge to total price
+  }, 0);
 
   function handleOrderClick() {
     if (cart.length === 0) {
@@ -16,88 +36,119 @@ function Cart() {
     navigate("/order-form", { state: { cart, cartTotal } });
   }
 
-  const cartTotal = cart.reduce((total, item) => total + item.quantity * item.price, 0);
-  
-
   return (
     <>
       <ProductDetailsHeader />
-      {/* Apply background color to the entire page */}
-      <div style={{ backgroundColor: '#ffecd1', minHeight: '100vh', paddingTop: '60px' }}>
-        <div className="container my-4">
-          <header className="d-flex justify-content-between align-items-center border-bottom pb-3">
-            <h2 className="font-weight-bold">Your Cart</h2>
-            <button className="btn btn-warning text-dark px-4">
-              Cart ({cart.length})
-            </button>
+      <div className="cart-container">
+        <div className="cart-content">
+          <header className="cart-header d-flex justify-content-between align-items-center">
+            <h2>Your Cart</h2>
+            <button className="cart-button">Cart ({cart.length})</button>
           </header>
 
           {cart.length > 0 ? (
-            <>
-              <div className="list-group my-3">
-                {cart.map((item, index) => 
-                (
-                  <div 
-                    key={index} 
-                    className="list-group-item p-3 d-flex align-items-start gap-4 border-0"
-                    style={{
-                      border: '1px solid #ddd',  // Add border to make it look like a card
-                      borderRadius: '8px',        // Rounded corners
-                      backgroundColor: '#ffffff'  // White background for each card
-                    }}
-                  >
-                    <div className="col-2">
-                      <img src={item.image_url} alt={item.name} className="img-fluid rounded" />
+            <div className="cart-items">
+              {cart.map((item, index) => {
+                const customizationCharge = calculateCustomizationCharge(item);  // Get dynamic customization charge
+                return (
+                  <div key={index} className="cart-item">
+                    {/* Column 1: Image */}
+                    <div className="cart-item-col image-col">
+                      <img src={item.image_url} alt={item.name} className="cart-item-image" />
                     </div>
-                    <div className="flex-grow-1">
-                      <h5 className="mb-1">{item.name}</h5>
-                      <p className="text-muted mb-0">Price: Ksh {item.price.toFixed(2)} </p>
-                      <p className="text-muted mb-0">Edition: {item.edition}</p>
-                      <p className="text-muted mb-0">Size: {item.size}</p>
-                      <p className="text-muted mb-0">Badge: {item.badge}</p>
-                      {item.customName && (
-                        <p className="text-muted mb-0">Custom Name: {item.customName}</p>
-                      )}
-                      {item.customNumber && (
-                        <p className="text-muted mb-0">Custom Number: {item.customNumber}</p>
-                      )}
-                      <p className="text-muted mb-0">Font Type: {item.fontType}</p>
-                    </div>
-                    <button
-                      className="btn btn-outline-danger btn-sm ms-auto"
-                      onClick={() => removeFromCart(item.id)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
 
-              <div className="mt-4">
+                    {/* Column 2: Product Details */}
+                    <div className="cart-item-col details-col">
+                      <h5 className="item-name">{item.name}</h5>
+                      <p className="item-price">KES {item.price.toFixed(2)}</p>
+                      <p className="customization-charge">Customization Charges: KES {customizationCharge}</p>
+                    </div>
+
+                    {/* Column 3: Customization Charges */}
+                    <div className="cart-item-col customization-charges-col">
+                      <p className="kit-edition">Kit Edition: {item.edition}</p>
+                      <p className="size">Size (Adult): {item.size}</p>
+                    </div>
+
+                    {/* Column 4: Customization Options */}
+                    <div className="cart-item-col customization-options-col">
+                      <h6>Customization</h6>
+                      {item.badge && <p><strong>Badge:</strong> {item.badge}</p>} {/* Added badge */}
+                      {item.foundation && <p><strong>Foundation:</strong> {item.foundation}</p>}
+                      {item.customName && <p><strong>Name:</strong> {item.customName}</p>}
+                      {item.customNumber && <p><strong>Number:</strong> {item.customNumber}</p>}
+                      {item.fontType && <p><strong>Font Type:</strong> {item.fontType}</p>}
+                    </div>
+
+                    {/* Column 5: Quantity Controls */}
+                    <div className="cart-item-col controls-col">
+                      <button className="minus" onClick={() => updateQuantity(item.id, item.quantity - 1)}>-</button>
+                      <div className="quantity-box">
+                        {item.quantity}
+                      </div>
+                      <button className="plus" onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+                      <span className="total-price">KES {(item.price * item.quantity + customizationCharge * item.quantity).toFixed(2)}</span>
+                    </div>
+
+                    {/* Column 6: Trash Icon */}
+                    <div className="cart-item-col remove-btn">
+                      <button onClick={() => removeFromCart(item.id)} className="remove-btn">
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+
+              <div className="order-summary">
                 <h4>Order Summary</h4>
-                <div className="d-flex justify-content-between border-top pt-2">
+                <div className="order-summary-products">
+                  {cart.map((item, index) => {
+                    const customizationCharge = calculateCustomizationCharge(item);
+                    return (
+                      <div key={index} className="order-summary-product">
+                        <img src={item.image_url} alt={item.name} />
+                        <div className="order-summary-product-details">
+                          <div className="order-summary-product-name" style={{ fontWeight: 'bold' }}>{item.name}</div>
+                          <div className="order-summary-product-info" style={{ fontWeight: 'bold' }}>
+                            Size: {item.size || "N/A"}, 
+                            Edition: {item.edition || "N/A"}
+                          </div>
+
+                          {/* Show customization options with their prices */}
+                          <div className="order-summary-product-customizations" style={{ fontWeight: 'bold' }}>
+                            {item.badge && <p><strong>Badge:</strong> KES 100</p>} {/* Price for Badge */}
+                            {item.customName && <p><strong>Name:</strong> KES 200</p>} {/* Price for Name */}
+                            {item.customNumber && <p><strong>Number:</strong> KES 200</p>} {/* Price for Number */}
+                            {item.fontType && <p><strong>Font Type:</strong> KES 100</p>} {/* Price for Font Type */}
+                          </div>
+                        </div>
+                        <div className="order-summary-product-quantity" style={{ fontWeight: 'bold' }}>{item.quantity}</div>
+                        <div className="order-summary-product-price" style={{ fontWeight: 'bold' }}>
+                          KES {(item.price * item.quantity + customizationCharge * item.quantity).toFixed(2)}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="order-summary-total" style={{ fontWeight: 'bold' }}>
                   <span>Total</span>
-                  <span>Ksh {cartTotal.toFixed(2)}</span>
+                  <span>KES {cartTotal.toFixed(2)}</span>
                 </div>
               </div>
 
-              <div className="mt-3 d-flex gap-2">
-                <button
-                  className="btn btn-outline-secondary flex-grow-1"
-                  onClick={() => navigate("/products")}
-                >
+              <div className="cart-actions">
+                <button onClick={() => navigate("/products")} className="continue-btn">
                   Continue Shopping
                 </button>
-                <button
-                  className="btn btn-warning flex-grow-1"
-                  onClick={handleOrderClick}
-                >
+                <button onClick={handleOrderClick} className="order-btn">
                   Order Now
                 </button>
               </div>
-            </>
+            </div>
           ) : (
-            <p className="mt-4">Your cart is empty.</p>
+            <p className="empty-cart">Your cart is empty.</p>
           )}
         </div>
       </div>

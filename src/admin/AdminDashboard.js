@@ -96,6 +96,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
+    
       <header className="dashboard-header">
         <h1>Admin Dashboard</h1>
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
@@ -109,6 +110,7 @@ const AdminDashboard = () => {
         {showForm && (
           <div className="product-form-section">
             <MultiStepForm />
+            
           </div>
         )}
 

@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import RelatedProduct from './RelatedProduct';
 import CartContext from '../../CartContext';
 import './ProductDetails.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+
 
 function ProductDetail() {
   const { id } = useParams();
@@ -23,6 +26,10 @@ function ProductDetail() {
     nameText: '',
     numberText: '',
   });
+  const [showWarning, setShowWarning] = useState(false);
+
+  // Reference to scroll back to the selection options
+  const selectionRef = useRef(null);
 
   useEffect(() => {
     fetch(`http://127.0.0.1:5000/products/${id}`)
@@ -32,7 +39,6 @@ function ProductDetail() {
       })
       .then(data => {
         data.sizes = data.sizes ? JSON.parse(data.sizes) : [];
-        console.log("Parsed Sizes:", data.sizes);  
         setProduct(data);
         setLoading(false);
       })
@@ -51,9 +57,9 @@ function ProductDetail() {
 
   // Calculate the total price
   const additionalPrice = 
-  (customOptions.printName ? 200 : 0) + 
-  (customOptions.printNumber ? 200 : 0) + 
-  (selectedBadge ? 100 : 0);
+    (customOptions.printName ? 200 : 0) + 
+    (customOptions.printNumber ? 200 : 0) + 
+    (selectedBadge ? 100 : 0);
 
   const totalPrice = quantity * (price + additionalPrice);
 
@@ -62,14 +68,36 @@ function ProductDetail() {
   };
 
   const handleQuantityChange = (amount) => {
-    setQuantity(prev => Math.max(1, prev + amount));
+    setQuantity(prev => Math.max(1, prev + amount)); // Prevent quantity from going below 1
   };
 
   const handleBadgeChange = (badge) => {
     setSelectedBadge(prevBadge => prevBadge === badge ? '' : badge);
   };
 
-  const canAddToCart = selectedEdition && selectedSize && selectedBadge && customOptions.fontType;
+  const canAddToCart = selectedEdition && selectedSize;
+
+  const handleAddToCart = () => {
+    if (!canAddToCart) {
+      setShowWarning(true);
+      selectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: totalPrice,
+      quantity,
+      image_url: product.image_url,
+      edition: selectedEdition,
+      size: selectedSize,
+      badge: selectedBadge,
+      customName: customOptions.nameText,
+      customNumber: customOptions.numberText,
+      fontType: customOptions.fontType,
+    });
+  };
 
   const badges = [
     { name: 'Europa', description: 'Europa Badge with Foundation + Ksh 100' },
@@ -98,127 +126,174 @@ function ProductDetail() {
 
             {category?.name === 'Jerseys' && (
               <>
-                <div className="selection-options mt-4">
-                  <h5>* Select Kit Edition</h5>
-                  {['Fan Edition', 'Player Edition'].map((edition) => (
-                    <button key={edition} className={`btn btn-edition ${selectedEdition === edition ? 'selected' : ''}`} onClick={() => setSelectedEdition(edition)}>
-                      {edition}
-                    </button>
-                  ))}
+                <div className="selection-options mt-4" ref={selectionRef}>
+                  <h5 className={`required-label ${!selectedEdition && showWarning ? 'warning-text' : ''}`}>
+                    * Select Kit Edition
+                  </h5>
+                  <div className="d-flex">
+                    {['Fan Edition', 'Player Edition'].map((edition) => (
+                      <button 
+                        key={edition} 
+                        className={`btn btn-edition mx-1 ${selectedEdition === edition ? 'selected' : ''} ${!selectedEdition && showWarning ? 'warning-border' : ''}`} 
+                        onClick={() => setSelectedEdition(edition)}
+                      >
+                        {edition}
+                      </button>
+                    ))}
+                  </div>
 
-<h5 className="mt-3">* Select Size (adult)</h5>
-<div className="size-options">
-  {Array.isArray(product.sizes) && product.sizes.length > 0 ? (
-    product.sizes.map((size) => (
-      <button 
-        key={size} 
-        className={`btn btn-size ${selectedSize === size ? 'selected' : ''}`} 
-        onClick={() => setSelectedSize(size)}
-      >
-        {size}
-      </button>
-    ))
-  ) : (
-    <p>No sizes available.</p>
-  )}
-</div>
-
+                  <h5 className={`mt-3 required-label ${!selectedSize && showWarning ? 'warning-text' : ''}`}>
+                    * Select Size (adult)
+                  </h5>
+                  <div className="size-options d-flex flex-wrap">
+                    {Array.isArray(product.sizes) && product.sizes.length > 0 ? (
+                      product.sizes.map((size) => (
+                        <button 
+                          key={size} 
+                          className={`btn btn-size m-1 ${selectedSize === size ? 'selected' : ''} ${!selectedSize && showWarning ? 'warning-border' : ''}`} 
+                          onClick={() => setSelectedSize(size)}
+                        >
+                          {size}
+                        </button>
+                      ))
+                    ) : (
+                      <p>No sizes available.</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="badge-options mt-3">
-                  <h5>Badge</h5>
-                  {visibleBadges.map(badge => (
-                    <label key={badge.name}>
-                      <input 
-                        type="radio" 
-                        name="badge" 
-                        checked={selectedBadge === badge.name}
-                        onChange={() => handleBadgeChange(badge.name)}
-                      /> 
-                      {badge.description}
-                    </label>
-                  ))}
-                  <button 
-                    onClick={() => setShowMoreBadges(!showMoreBadges)} 
-                    className="btn btn-link"
-                  >
-                    {showMoreBadges ? 'Show Less' : 'Show More'}
-                  </button>
-                </div>
-
-                <div className="font-options mt-3">
-                  <h5>Font Type</h5>
-                  <label>
-                    <input type="radio" name="fontType" value="League Font" onChange={() => setCustomOptions(prev => ({ ...prev, fontType: 'League Font' }))} /> 
-                    LEAGUE FONT + Ksh 0
-                  </label>
-                  <label>
-                    <input type="radio" name="fontType" value="Team Font" onChange={() => setCustomOptions(prev => ({ ...prev, fontType: 'Team Font' }))} /> 
-                    TEAM FONT + Ksh 0
-                  </label>
-                </div>
-
+                {/* Customization options */}
                 <div className="custom-options mt-3">
-                  <h5>Custom</h5>
-                  <label>
-                    <input type="checkbox" checked={customOptions.printName} onChange={() => handleCustomOptionChange('printName')} /> 
-                    PRINT NAME + Ksh 200
-                    {customOptions.printName && <input type="text" placeholder="Enter Name" onChange={(e) => setCustomOptions(prev => ({ ...prev, nameText: e.target.value }))} />}
-                  </label>
-                  <label>
-                    <input type="checkbox" checked={customOptions.printNumber} onChange={() => handleCustomOptionChange('printNumber')} /> 
-                    PRINT NUMBER + Ksh 200
-                    {customOptions.printNumber && <input type="text" placeholder="Enter Number" onChange={(e) => setCustomOptions(prev => ({ ...prev, numberText: e.target.value }))} />}
-                  </label>
+                  <h5>Customization </h5>
+                  <div className="d-flex align-items-center">
+                    <label className="me-3">
+                      <input 
+                        type="checkbox" 
+                        checked={customOptions.printName} 
+                        onChange={() => handleCustomOptionChange('printName')} 
+                      />
+                      Print Name + Ksh 200
+                    </label>
+                    {customOptions.printName && (
+                      <input 
+                        type="text" 
+                        className="form-control me-3" 
+                        placeholder="Enter Name" 
+                        value={customOptions.nameText} 
+                        onChange={(e) => setCustomOptions(prev => ({ ...prev, nameText: e.target.value }))}
+                      />
+                    )}
+                  </div>
+                  <div className="d-flex align-items-center mt-2">
+                    <label className="me-3">
+                      <input 
+                        type="checkbox" 
+                        checked={customOptions.printNumber} 
+                        onChange={() => handleCustomOptionChange('printNumber')} 
+                      />
+                      Print Number + Ksh 200
+                    </label>
+                    {customOptions.printNumber && (
+                      <input 
+                        type="text" 
+                        className="form-control me-3" 
+                        placeholder="Enter Number" 
+                        value={customOptions.numberText} 
+                        onChange={(e) => setCustomOptions(prev => ({ ...prev, numberText: e.target.value }))}
+                      />
+                    )}
+                  </div>
+                  <div className="font-options mt-3">
+                    <h5>Font Type </h5>
+                    <label>
+                      <input type="radio" name="fontType" value="League Font" onChange={() => setCustomOptions(prev => ({ ...prev, fontType: 'League Font' }))} /> 
+                      LEAGUE FONT + Ksh 0
+                    </label>
+                    <label>
+                      <input type="radio" name="fontType" value="Team Font" onChange={() => setCustomOptions(prev => ({ ...prev, fontType: 'Team Font' }))} /> 
+                      TEAM FONT + Ksh 0
+                    </label>
+                  </div>
+
+                  <div className="badge-options mt-3">
+                    <h5>Badge </h5>
+                    {visibleBadges.map(badge => (
+                      <label key={badge.name}>
+                        <input 
+                          type="radio" 
+                          name="badge" 
+                          checked={selectedBadge === badge.name}
+                          onChange={() => handleBadgeChange(badge.name)}
+                        /> 
+                        {badge.description}
+                      </label>
+                    ))}
+                    <button 
+                      onClick={() => setShowMoreBadges(!showMoreBadges)} 
+                      className="btn btn-link"
+                    >
+                      {showMoreBadges ? 'Show Less' : 'Show More'}
+                    </button>
+                  </div>
                 </div>
               </>
             )}
 
-            <p>Category: {category?.name}</p>
+            {/* Quantity and price section */}
+            <div className="quantity-controls mt-4">
+  <h5>Quantity</h5>
+  <div className="d-flex align-items-center">
+    <button 
+      className="btn btn-secondary" 
+      onClick={() => handleQuantityChange(-1)} 
+      disabled={quantity <= 1}
+    >
+      -
+    </button>
+    <input 
+      type="number" 
+      className="form-control mx-2" 
+      value={quantity} 
+      readOnly
+    />
+    <button 
+      className="btn btn-secondary" 
+      onClick={() => handleQuantityChange(1)}
+    >
+      +
+    </button>
+  </div>
 
-            <div className="quantity-selector mt-3">
-              <button onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>-</button>
-              <span className="quantity-display mx-2">{quantity}</span>
-              <button onClick={() => handleQuantityChange(1)}>+</button>
             </div>
 
-            <div className="product-price mt-3">
-              <span className="discounted-price">Total: Ksh {totalPrice}</span>
+            {/* Price Calculation */}
+            <div className="price-summary mt-4">
+              <h5>Total Price: Ksh {totalPrice}</h5>
             </div>
 
             <div className="d-grid gap-2 my-4">
-              <button 
-                className="btn btn-dark btn-lg" 
-                disabled={!canAddToCart || stock <= 0} 
-                onClick={() => addToCart({
-                  id: product.id,
-                  name: product.name,
-                  price: totalPrice,
-                  quantity,
-                  image_url: product.image_url,
-                  edition: selectedEdition,
-                  size: selectedSize,
-                  badge: selectedBadge,
-                  customName: customOptions.nameText,
-                  customNumber: customOptions.numberText,
-                  fontType: customOptions.fontType,
-                })}
-              >
-                {stock > 0 ? 'Add to Cart' : 'Out of Stock'}
-              </button>
-            </div>
+  {showWarning && !canAddToCart && (
+    <p className="warning-text">Please select all available variations.</p>
+  )}
+  <button
+    className={`btn btn-sm ${canAddToCart ? 'btn-primary' : 'btn-dark'}`}
+    disabled={stock <= 0}
+    onClick={handleAddToCart}
+    style={{ fontSize: '0.9rem', padding: '8px 12px' }} // Smaller size
+  >
+    {stock > 0 ? (
+      <>
+        <FontAwesomeIcon icon={faShoppingCart} /> Add to Cart
+      </>
+    ) : (
+      'Out of Stock'
+    )}
+  </button>
+</div>
+
           </div>
         </div>
-        
-        <div className="row my-5 related-products-section">
-          <h3 className="text-center mb-4">Related Products</h3>
-          <RelatedProduct category_id={product.category.id} currentProductId={product.id} />
-        </div>
       </div>
-
-      <footer className="footer">
-        <p>&copy; 2023 Your Fashion Store. All Rights Reserved.</p>
-      </footer>
     </div>
   );
 }
