@@ -19,6 +19,7 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [errorOrders, setErrorOrders] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null); // Holds the currently selected order for viewing details
 
   const categoryImages = {
     "1": "",
@@ -94,6 +95,14 @@ const AdminDashboard = () => {
     fetchOrders();
   }, []);
 
+  const handleViewOrder = (order) => {
+    setSelectedOrder(order);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedOrder(null);
+  };
+
   return (
     <div className="admin-dashboard">
     
@@ -110,7 +119,6 @@ const AdminDashboard = () => {
         {showForm && (
           <div className="product-form-section">
             <MultiStepForm />
-            
           </div>
         )}
 
@@ -191,6 +199,7 @@ const AdminDashboard = () => {
                 <th>Phone</th>
                 <th>Location</th>
                 <th>Total Price</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -202,12 +211,47 @@ const AdminDashboard = () => {
                   <td>{order.phone}</td>
                   <td>{order.location}</td>
                   <td>{order.total_price}</td>
+                  <td>
+                    <button onClick={() => handleViewOrder(order)}>View</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         ) : (
           <p>No orders found.</p>
+        )}
+
+        {/* Modal for viewing order details */}
+        {selectedOrder && (
+          <div className="order-details-modal" onClick={handleCloseModal}>
+            <div className="order-details-content" onClick={(e) => e.stopPropagation()}>
+              <span className="close-modal" onClick={handleCloseModal}>&times;</span>
+              <h2>Order Details - Order ID: {selectedOrder.id}</h2>
+              <p><strong>Customer:</strong> {selectedOrder.name}</p>
+              <p><strong>Email:</strong> {selectedOrder.user?.email || selectedOrder.email}</p>
+              <p><strong>Phone:</strong> {selectedOrder.phone}</p>
+              <p><strong>Location:</strong> {selectedOrder.location}</p>
+              <p><strong>Total Price:</strong> {selectedOrder.total_price}</p>
+              
+              <h3>Order Items</h3>
+              <ul>
+                {selectedOrder.order_items.map((item, index) => (
+                  <li key={index}>
+                    <strong>{item.product_name}</strong>
+                    <p>Description: {item.description}</p>
+                    <p>Quantity: {item.quantity}</p>
+                    <p>Size: {item.size}</p>
+                    <p>Edition: {item.edition}</p>
+                    <p>Custom Name: {item.custom_name || 'N/A'}</p>
+                    <p>Custom Number: {item.custom_number || 'N/A'}</p>
+                    <p>Font Type: {item.font_type || 'N/A'}</p>
+                    <p>Total Item Price: {item.total_item_price}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         )}
 
         {selectedImage && (
